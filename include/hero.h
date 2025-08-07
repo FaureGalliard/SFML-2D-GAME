@@ -41,7 +41,7 @@ public:
         addAction(HeroState::Death, "DEATH", "death_strip13.png", {13, 1}, 0.1f, false);
     }
 
-void handleInput(float dt) {
+    void handleInput(float dt) {
         sf::Vector2f dir(0.f, 0.f);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) dir.x -= 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) dir.x += 1.f;
@@ -88,6 +88,7 @@ void handleInput(float dt) {
         if (velocity.x < 0) actions[currentState]->faceLeft();
         else if (velocity.x > 0) actions[currentState]->faceRight();
     }
+    
     void setState(HeroState newState) {
         if (currentState != newState) {
             currentState = newState;
