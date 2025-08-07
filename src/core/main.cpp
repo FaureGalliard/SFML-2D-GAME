@@ -22,13 +22,7 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)  window.close();
         }
-        sf::Vector2f dir(0.f, 0.f);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) dir.y -= 1.f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) dir.y += 1.f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) dir.x -= 1.f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) dir.x += 1.f;
-        hero.move(dir, dt);
-        hero.update(dt, dir);
+        hero.handleInput(dt);
         window.clear();
         hero.draw(window);
         window.display();
