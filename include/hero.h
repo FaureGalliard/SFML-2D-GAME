@@ -3,9 +3,10 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
-
 class Action {
 private:
+    std::vector<sf::Sprite> spritecompleto;
+    
     sf::Texture texture;
     sf::Sprite sprite;
 
@@ -34,6 +35,10 @@ public:
         texture3.loadFromFile(path3);
         sprite3.setTexture(texture3);
 
+        spritecompleto.push_back(sprite);
+        spritecompleto.push_back(sprite2);
+        spritecompleto.push_back(sprite3);
+
         updateTextureRect();
     }
 
@@ -60,30 +65,24 @@ public:
     void updateTextureRect() {
         int frameWidth = texture.getSize().x / frameCount.x;
         int frameHeight = texture.getSize().y / frameCount.y;
-        
-        sprite.setTextureRect(sf::IntRect(currentFrame.x * frameWidth,
-                                        currentFrame.y * frameHeight,
-                                        frameWidth, frameHeight));
-        
-        sprite2.setTextureRect(sf::IntRect(currentFrame.x * frameWidth,
-                                         currentFrame.y * frameHeight,
-                                         frameWidth, frameHeight));
-        
-        sprite3.setTextureRect(sf::IntRect(currentFrame.x * frameWidth,
-                                         currentFrame.y * frameHeight,
-                                         frameWidth, frameHeight));
+
+        for (auto& sprite : spritecompleto) {
+            sprite.setTextureRect(sf::IntRect(currentFrame.x * frameWidth,
+                                                currentFrame.y * frameHeight,
+                                                frameWidth, frameHeight));
+        }
     }
 
     void setPosition(float x, float y) {
-        sprite.setPosition(x, y);
-        sprite2.setPosition(x, y);
-        sprite3.setPosition(x, y);
+        for (auto& sprite : spritecompleto) {
+            sprite.setPosition(x, y);
+        }
     }
 
     void draw(sf::RenderWindow& window) {
-        window.draw(sprite);
-        window.draw(sprite2);
-        window.draw(sprite3);
+        for (const auto& sprite : spritecompleto) {
+            window.draw(sprite);
+        }
     }
 
     void reset() {
@@ -96,21 +95,17 @@ public:
     }
 
     void faceLeft() {
-        sprite.setScale(-1.f, 1.f);
-        sprite.setOrigin(sprite.getGlobalBounds().width, 0.f);
-        sprite2.setScale(-1.f, 1.f);
-        sprite2.setOrigin(sprite2.getGlobalBounds().width, 0.f);
-        sprite3.setScale(-1.f, 1.f);
-        sprite3.setOrigin(sprite3.getGlobalBounds().width, 0.f);
+        for (auto& sprite : spritecompleto) {
+            sprite.setScale(-1.f, 1.f);
+            sprite.setOrigin(sprite.getGlobalBounds().width, 0.f);
+        }   
     }
 
     void faceRight() {
-        sprite.setScale(1.f, 1.f);
-        sprite.setOrigin(0.f, 0.f);
-        sprite2.setScale(1.f, 1.f);
-        sprite2.setOrigin(0.f, 0.f);
-        sprite3.setScale(1.f, 1.f);
-        sprite3.setOrigin(0.f, 0.f);
+        for (auto& sprite : spritecompleto) {
+            sprite.setScale(1.f, 1.f);
+            sprite.setOrigin(0.f, 0.f);
+        }
     }
 };
 
