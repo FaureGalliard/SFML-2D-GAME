@@ -1,0 +1,58 @@
+@startuml nose
+enum HeroState {
+  Idle
+  Walking
+  Hurt
+  Death
+  Attack
+  Axe
+  Hamering
+  Roll
+  Run
+  Watering
+  Dig
+  Mining
+}
+
+class sf::Transformable {
+}
+
+class Action {
+  -paths: std::vector<std::string>
+  -frames: sf::Vector2i
+  -speed: float
+  -looping: bool
+  +reset()
+  +setPosition(x: float, y: float)
+  +update(dt: float)
+  +isLooping(): bool
+  +isFinished(): bool
+  +faceLeft()
+  +faceRight()
+  +draw(window: sf::RenderWindow&)
+}
+
+class Hero {
+  -velocity: sf::Vector2f
+  -speed: float = 100.f
+  -actionTimer: float = 0.f
+  -overrideState: HeroState = Idle
+  -isOverriding: bool = false
+  -actions: std::map<HeroState, std::unique_ptr<Action>>
+  -currentState: HeroState = Idle
+  +Hero()
+  +addAction(state: HeroState, folder: std::string, name: std::string, frames: sf::Vector2i, speed: float = 0.1f, looping: bool = true)
+  +initActions()
+  +processInput(): sf::Vector2f
+  +move(direction: sf::Vector2f&, dt: float)
+  +updateState(dt: float, direction: sf::Vector2f&)
+  +handleInput(dt: float)
+  +setAction(newState: HeroState)
+  +draw(window: sf::RenderWindow&)
+}
+
+Hero --|> sf::Transformable
+Hero o--> "many" Action : actions
+Hero --> HeroState : currentState, overrideState
+
+@enduml
