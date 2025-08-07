@@ -1,0 +1,134 @@
+@startuml ScreensDiagramClass
+
+' Abstract base class for all screens
+abstract class Screen {
+  +handleInput(window: sf::RenderWindow&, controller: sf::Joystick)
+  +update(deltaTime: float)
+  +render(window: sf::RenderWindow&)
+}
+
+' Main game class to manage the window and screen transitions
+class Game {
+  -window: sf::RenderWindow
+  -currentScreen: std::unique_ptr<Screen>
+  -gameManager: std::unique_ptr<GameManager>
+  +Game()
+  +setScreen(newScreen: std::unique_ptr<Screen>)
+  +run()
+  +saveGame(filename: String)
+  +loadGame(filename: String)
+}
+
+' Start screen for the main menu
+class StartScreen {
+  -game: Game*
+  -font: sf::Font
+  -btnPlay: sf::RectangleShape
+  -btnSettings: sf::RectangleShape
+  -btnScores: sf::RectangleShape
+  -btnExit: sf::RectangleShape
+  -btnPlayText: sf::Text
+  -btnSettingsText: sf::Text
+  -btnScoresText: sf::Text
+  -btnExitText: sf::Text
+  -lblTitle: sf::Text
+  +StartScreen(game: Game*)
+  +handleInput(window: sf::RenderWindow&, controller: sf::Joystick)
+  +update(deltaTime: float)
+  +render(window: sf::RenderWindow&)
+}
+
+' Game screen for core gameplay
+class GameScreen {
+  -game: Game*
+  -backgroundTexture: sf::Texture
+  -background: sf::Sprite
+  -gameManager: std::unique_ptr<GameManager>
+  -keyStates: std::map<sf::Keyboard::Key, bool>
+  -controllerStates: std::map<sf::Joystick::Button, bool>
+  +GameScreen(game: Game*)
+  +handleInput(window: sf::RenderWindow&, controller: sf::Joystick)
+  +update(deltaTime: float)
+  +render(window: sf::RenderWindow&)
+}
+
+' Pause screen for in-game menu (accessible via ESC)
+class PauseScreen {
+  -game: Game*
+  -font: sf::Font
+  -btnResume: sf::RectangleShape
+  -btnSave: sf::RectangleShape
+  -btnExit: sf::RectangleShape
+  -btnResumeText: sf::Text
+  -btnSaveText: sf::Text
+  -btnExitText: sf::Text
+  +PauseScreen(game: Game*)
+  +handleInput(window: sf::RenderWindow&, controller: sf::Joystick)
+  +update(deltaTime: float)
+  +render(window: sf::RenderWindow&)
+}
+
+' Scores screen for displaying high scores
+class ScoresScreen {
+  -game: Game*
+  -font: sf::Font
+  -btnReturn: sf::RectangleShape
+  -btnReturnText: sf::Text
+  -scores: std::vector<int>
+  +ScoresScreen(game: Game*)
+  +handleInput(window: sf::RenderWindow&, controller: sf::Joystick)
+  +update(deltaTime: float)
+  +render(window: sf::RenderWindow&)
+  +loadScores()
+}
+
+' Settings screen for resolution and input configuration
+class SettingsScreen {
+  -game: Game*
+  -font: sf::Font
+  -btnResolution: sf::RectangleShape
+  -btnInput: sf::RectangleShape
+  -btnReturn: sf::RectangleShape
+  -btnResolutionText: sf::Text
+  -btnInputText: sf::Text
+  -btnReturnText: sf::Text
+  -resolutions: std::vector<sf::VideoMode>
+  +SettingsScreen(game: Game*)
+  +handleInput(window: sf::RenderWindow&, controller: sf::Joystick)
+  +update(deltaTime: float)
+  +render(window: sf::RenderWindow&)
+  +changeResolution(mode: sf::VideoMode)
+  +setInputType(type: String)
+}
+
+' GameManager class to manage core game logic
+class GameManager {
+  -player: Player
+  -map: Map
+  -enemies: std::vector<Enemy>
+  -level: int
+  +GameManager()
+  +update(deltaTime: float, keyStates: std::map<sf::Keyboard::Key, bool>, controllerStates: std::map<sf::Joystick::Button, bool>)
+  +draw(window: sf::RenderWindow&)
+  +saveState(filename: String)
+  +loadState(filename: String)
+}
+
+' Relationships
+Game o--> "1" Screen : currentScreen
+Game o--> "1" GameManager
+StartScreen --|> Screen
+GameScreen --|> Screen
+PauseScreen --|> Screen
+ScoresScreen --|> Screen
+SettingsScreen --|> Screen
+GameScreen --> GameManager : manages
+StartScreen --> Game : navigates
+ScoresScreen --> Game : navigates
+SettingsScreen --> Game : navigates
+PauseScreen --> Game : navigates
+GameManager --> Player
+GameManager --> Map
+GameManager --> Enemy
+
+@enduml
