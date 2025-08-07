@@ -13,16 +13,16 @@ private:
     sf::Vector2i frameCount;
     sf::Vector2i currentFrame;
     bool facingLeft = false;
+    bool loop = true;
     float frameTime = 0.1f;     
     float timer = 0.f;          
 
 public:
-    Action(const std::vector<std::string>& paths, sf::Vector2i _frameCount, float _frameTime = 0.1f)
-    : frameCount(_frameCount), currentFrame(0, 0), frameTime(_frameTime)
-{
-    loadSprites(paths);
-    updateTextureRect();
-}
+    Action(const std::vector<std::string>& paths, sf::Vector2i _frameCount, float _frameTime = 0.1f, bool _loop = true)
+        : frameCount(_frameCount), currentFrame(0, 0), frameTime(_frameTime), loop(_loop) {
+        loadSprites(paths);
+        updateTextureRect();
+    }
 
     void loadSprites(const std::vector<std::string>& paths) {
         layerTextures.resize(paths.size());
@@ -56,7 +56,11 @@ public:
             currentFrame.x = 0;
             currentFrame.y++;
             if (currentFrame.y >= frameCount.y) {
-                currentFrame.y = 0; 
+                if (loop) {
+                    currentFrame.y = 0; 
+                } else {
+                    currentFrame.y = frameCount.y - 1;
+                }
             }
         }
         currentRect = sf::IntRect(
@@ -96,9 +100,14 @@ public:
         updateTextureRect();
     }
 
+    bool isFinished() const {
+        return !loop && currentFrame.x == frameCount.x - 1 && currentFrame.y == frameCount.y - 1;
+    }
+
     void faceLeft() { facingLeft = true; }
     void faceRight() { facingLeft = false; }
     sf::Vector2i getFrameCount() const {
         return frameCount;
     }
+    bool isLooping() const { return loop; }
 };
