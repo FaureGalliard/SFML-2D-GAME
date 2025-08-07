@@ -68,7 +68,9 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "scoresscreen": "cpp"
+        "scoresscreen": "cpp",
+        "set": "cpp",
+        "fstream": "cpp"
     }
     
 }

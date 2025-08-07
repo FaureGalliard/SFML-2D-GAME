@@ -18,8 +18,6 @@ int main() {
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
 
-        hero.update(dt);
-
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)  window.close();
@@ -29,8 +27,8 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) dir.y += 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) dir.x -= 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) dir.x += 1.f;
-        hero.move(dir * dt);   
-        hero.update(dt);
+        hero.move(dir, dt);
+        hero.update(dt, dir);
         window.clear();
         hero.draw(window);
         window.display();
