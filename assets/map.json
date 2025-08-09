@@ -1,0 +1,16 @@
+{
+  "background": "assets/background.png",
+    "tileset": "assets/FinalTileset.png",
+
+  "catalog": {
+    "arbol":   { "tileX": 9, "tileY": 5, "tilesW": 2, "tilesH": 3 },
+    "piedra":  { "tileX": 4, "tileY": 3, "tilesW": 1, "tilesH": 1 },
+    "arbusto": { "tileX": 5, "tileY": 4, "tilesW": 1, "tilesH": 1 }
+  },
+
+  "decorations": [
+    { "type": "arbusto", "x": 50,  "y": 100 },
+    { "type": "piedra",  "x": 120, "y": 140 },
+    { "type": "arbol",   "x": 200, "y": 180 }
+  ]
+}

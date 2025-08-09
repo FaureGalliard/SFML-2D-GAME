@@ -11,7 +11,7 @@ private:
     float speed = 100.f;
     HeroState currentState = HeroState::Idle;
     std::map<HeroState, std::unique_ptr<Action>> actions;
-
+    bool facingRight = true;
 public:
     Hero() = default;
 
@@ -43,56 +43,80 @@ public:
 
     void handleInput(float dt) {
         sf::Vector2f dir(0.f, 0.f);
+
+        // Movimiento direccional
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) dir.x -= 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) dir.x += 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) dir.y -= 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) dir.y += 1.f;
 
-        // Adjust speed for running
+        // Velocidad
         float currentSpeed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ? speed * 2.f : speed;
         velocity = dir * currentSpeed;
         move(velocity * dt);
 
-        // Handle state transitions for actions
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && actions[currentState]->isLooping()) {
-            setState(HeroState::Attack);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && actions[currentState]->isLooping()) {
-            setState(HeroState::Axe);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) && actions[currentState]->isLooping()) {
-            setState(HeroState::Roll);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::C) && actions[currentState]->isLooping()) {
-            setState(HeroState::Hammering);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) && actions[currentState]->isLooping()) {
-            setState(HeroState::Watering);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) && actions[currentState]->isLooping()) {
-            setState(HeroState::Dig);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::G) && actions[currentState]->isLooping()) {
-            setState(HeroState::Mining);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::H) && actions[currentState]->isLooping()) {
-            setState(HeroState::Hurt);
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::J) && actions[currentState]->isLooping()) {
-            setState(HeroState::Death);
-        } else if (!actions[currentState]->isLooping() && actions[currentState]->isFinished()) {
-            setState(dir != sf::Vector2f(0.f, 0.f) ? 
-                     (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ? HeroState::Run : HeroState::Walking) : 
-                     HeroState::Idle);
-        } else if (actions[currentState]->isLooping()) {
-            setState(dir != sf::Vector2f(0.f, 0.f) ? 
-                     (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ? HeroState::Run : HeroState::Walking) : 
-                     HeroState::Idle);
+        Action* currentAction = actions[currentState].get();
+
+        // Mapa de teclas y estados especiales
+        const std::vector<std::pair<sf::Keyboard::Key, HeroState>> keyActions = {
+            {sf::Keyboard::Space, HeroState::Attack},
+            {sf::Keyboard::E,     HeroState::Axe},
+            {sf::Keyboard::R,     HeroState::Roll},
+            {sf::Keyboard::C,     HeroState::Hammering},
+            {sf::Keyboard::Q,     HeroState::Watering},
+            {sf::Keyboard::F,     HeroState::Dig},
+            {sf::Keyboard::G,     HeroState::Mining},
+            {sf::Keyboard::H,     HeroState::Hurt},
+            {sf::Keyboard::J,     HeroState::Death}
+        };
+
+        bool actionTriggered = false;
+
+        // Detectar acción especial
+        if (currentAction->isLooping()) {
+            for (auto& [key, state] : keyActions) {
+                if (sf::Keyboard::isKeyPressed(key)) {
+                    setState(state);
+                    currentAction = actions[currentState].get(); // recargar puntero
+                    actionTriggered = true;
+                    break;
+                }
+            }
         }
 
-        // Update action and facing direction
-        actions[currentState]->update(dt);
-        actions[currentState]->setPosition(getPosition().x, getPosition().y);
-        if (velocity.x < 0) actions[currentState]->faceLeft();
-        else if (velocity.x > 0) actions[currentState]->faceRight();
+        // Si no hay acción especial, elegir Idle / Walk / Run
+        if (!actionTriggered) {
+            bool moving = dir != sf::Vector2f(0.f, 0.f);
+            HeroState targetState =
+                moving ? (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ? HeroState::Run : HeroState::Walking)
+                       : HeroState::Idle;
+
+            if ((!currentAction->isLooping() && currentAction->isFinished()) ||
+                currentAction->isLooping()) {
+                setState(targetState);
+                currentAction = actions[currentState].get();
+            }
+        }
+
+        // Actualizar animación
+        currentAction->update(dt);
+        currentAction->setPosition(getPosition().x, getPosition().y);
+
+        // Dirección
+        if (velocity.x < 0) facingRight = false, currentAction->faceLeft();
+        else if (velocity.x > 0) facingRight = true, currentAction->faceRight();
+        else{
+                if (facingRight) currentAction->faceRight();
+                else currentAction->faceLeft();
+        }
     }
-    
+
     void setState(HeroState newState) {
         if (currentState != newState) {
             currentState = newState;
-            actions[currentState]->reset();
+            auto* action = actions[currentState].get();
+            action->reset();
+            action->setPosition(getPosition().x, getPosition().y); // 🔹 evita parpadeo
         }
     }
 

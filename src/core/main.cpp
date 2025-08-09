@@ -1,32 +1,46 @@
-//main.cpp
 #include <SFML/Graphics.hpp>
-#include <nlohmann/json.hpp>
 #include "hero.h"
-#include "utils.h"
+#include "map.h" // Tu clase Map
+
 int main() {
-    const int GAME_WIDTH = 320;
-    const int GAME_HEIGHT = 180;
-    Hero hero;
-    hero.initActions();
-    sf::Clock clock;
+    const int GAME_WIDTH = 512;  // Resolución base
+    const int GAME_HEIGHT = 288;
 
-
-    sf::RenderWindow window(sf::VideoMode(GAME_WIDTH*4, GAME_HEIGHT*4), "Mi primer juego con SFML");
+    sf::RenderWindow window(sf::VideoMode(GAME_WIDTH * 2, GAME_HEIGHT * 2), "Mi primer juego con SFML");
     window.setFramerateLimit(60);
+
+    // Vista base (para escalado)
     sf::View view(sf::FloatRect(0, 0, GAME_WIDTH, GAME_HEIGHT));
     window.setView(view);
+
+    // Reloj para delta time
+    sf::Clock clock;
+
+    // Mapa y héroe
+    Map map;
+
+    Hero hero;
+    hero.initActions();
+
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
 
+        // Eventos
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)  window.close();
+            if (event.type == sf::Event::Closed)
+                window.close();
         }
+
+        // --- Update ---
         hero.handleInput(dt);
+
+        // --- Render ---
         window.clear();
-        hero.draw(window);
+        map.draw(window);   // Fondo primero
+        hero.draw(window);  // Luego personaje
         window.display();
     }
 
-        return 0;
+    return 0;
 }

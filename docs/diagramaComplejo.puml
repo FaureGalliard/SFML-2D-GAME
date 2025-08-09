@@ -1,58 +1,194 @@
-@startuml nose
-enum HeroState {
-  Idle
-  Walking
-  Hurt
-  Death
-  Attack
-  Axe
-  Hamering
-  Roll
-  Run
-  Watering
-  Dig
-  Mining
+@startuml ForestGameClassDiagram
+
+' Game class to manage the overall game state
+class Game {
+    -map: Map
+    -player: Hero
+    -enemies: Skeleton[]
+    -gameState: String
+    -level: int
+    +startGame()
+    +saveGame()
+    +loadGame()
+    +update()
+    +render()
+    +increaseLevel()
+    +endGame()
 }
 
-class sf::Transformable {
-}
-
-class Action {
-  -paths: std::vector<std::string>
-  -frames: sf::Vector2i
-  -speed: float
-  -looping: bool
-  +reset()
-  +setPosition(x: float, y: float)
-  +update(dt: float)
-  +isLooping(): bool
-  +isFinished(): bool
-  +faceLeft()
-  +faceRight()
-  +draw(window: sf::RenderWindow&)
-}
-
+' Hero class for the protagonist (lumberjack)
 class Hero {
-  -velocity: sf::Vector2f
-  -speed: float = 100.f
-  -actionTimer: float = 0.f
-  -overrideState: HeroState = Idle
-  -isOverriding: bool = false
-  -actions: std::map<HeroState, std::unique_ptr<Action>>
-  -currentState: HeroState = Idle
-  +Hero()
-  +addAction(state: HeroState, folder: std::string, name: std::string, frames: sf::Vector2i, speed: float = 0.1f, looping: bool = true)
-  +initActions()
-  +processInput(): sf::Vector2f
-  +move(direction: sf::Vector2f&, dt: float)
-  +updateState(dt: float, direction: sf::Vector2f&)
-  +handleInput(dt: float)
-  +setAction(newState: HeroState)
-  +draw(window: sf::RenderWindow&)
+    -position: Vector2f
+    -velocity: Vector2f
+    -speed: float
+    -currentState: HeroState
+    -actions: Map<HeroState, Action>
+    -inventory: Inventory
+    -health: int
+    +addAction(state: HeroState, folder: String, file: String, frames: Vector2i, frameSpeed: float, looping: bool)
+    +initActions()
+    +handleInput(dt: float)
+    +setState(newState: HeroState)
+    +draw(window: RenderWindow)
+    +move(direction: String)
+    +plantSeed(seedType: String)
+    +useTool(tool: Tool)
+    +fillBucket(well: Well)
+    +waterPlant(plant: Plant)
+    +attack(enemy: Skeleton)
 }
 
-Hero --|> sf::Transformable
-Hero o--> "many" Action : actions
-Hero --> HeroState : currentState, overrideState
+' Action class for hero animations
+class Action {
+    -sprites: Sprite[]
+    -textures: Texture[]
+    -frameSize: Vector2i
+    -frameCount: Vector2i
+    -currentFrame: Vector2i
+    -frameTime: float
+    -timer: float
+    -loop: bool
+    -facingLeft: bool
+    +update(deltaTime: float)
+    +updateTextureRect()
+    +setPosition(x: float, y: float)
+    +draw(window: RenderWindow)
+    +reset()
+    +isFinished(): bool
+    +faceLeft()
+    +faceRight()
+    +isLooping(): bool
+}
+
+' Inventory class
+class Inventory {
+    -seeds: Seed[]
+    -tools: Tool[]
+    -bucket: Bucket
+    +addSeed(seed: Seed)
+    +addTool(tool: Tool)
+    +getBucket(): Bucket
+    +getSeeds(): Seed[]
+    +getTools(): Tool[]
+}
+
+' Bucket class
+class Bucket {
+    -waterLevel: int
+    -maxCapacity: int
+    +fill()
+    +useWater(amount: int)
+    +isEmpty(): bool
+}
+
+' Tool class
+class Tool {
+    -type: String
+    -damage: int
+    +use(target: Object)
+}
+
+' Plant class
+class Plant {
+    -type: String
+    -growthStage: int
+    -isBurning: bool
+    +grow()
+    +water()
+    +burn()
+    +isFullyGrown(): bool
+}
+
+' Tree class
+class Tree {
+    -height: int
+    +chop()
+}
+
+' Fire class
+class Fire {
+    -position: Vector2D
+    -spreadRate: float
+    +spread()
+    +extinguish()
+}
+
+' Abstract Enemy class
+abstract class Enemy {
+    -position: Vector2D
+    -health: int
+    +attack(player: Hero)
+    +move()
+    +die()
+}
+
+' Skeleton class
+class Skeleton {
+    -attackType: String
+    +setRandomAttack()
+    +startFire(fire: Fire)
+}
+
+' GiantSkeleton class
+class GiantSkeleton {
+    -specialAttack: String
+    +useSpecialAttack()
+}
+
+' Map class
+class Map {
+    -tiles: Tile[][]
+    -wells: Well[]
+    -plants: Plant[]
+    -fires: Fire[]
+    +generateProceduralMap()
+    +updateEnvironment()
+    +destroyObject(object: Object)
+}
+
+' Well class
+class Well {
+    -position: Vector2D
+    +fillBucket(bucket: Bucket)
+}
+
+' Enum for hero states
+enum HeroState {
+    Idle
+    Walking
+    Hurt
+    Death
+    Attack
+    Axe
+    Hammering
+    Roll
+    Run
+    Watering
+    Dig
+    Mining
+}
+
+' Relationships
+Game "1" --> "1" Hero
+Game "1" --> "1" Map
+Game "1" --> "*" Enemy
+Hero "1" --> "1" Inventory
+Hero "1" --> "*" Action
+Inventory "1" --> "1" Bucket
+Inventory "1" --> "*" Tool
+Inventory "1" --> "*" Seed
+Map "1" --> "*" Tile
+Map "1" --> "*" Plant
+Map "1" --> "*" Fire
+Map "1" --> "*" Well
+Plant <|-- Tree
+Enemy <|-- Skeleton
+Enemy <|-- GiantSkeleton
+Skeleton --> Fire : can start
+Hero --> Skeleton : attacks
+Hero --> Plant : plants/waters
+Hero --> Fire : extinguishes
+Hero --> Well : fills bucket
+Hero --> HeroState
 
 @enduml
