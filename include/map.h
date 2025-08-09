@@ -1,25 +1,24 @@
-// map.h
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 #include <fstream>
-#include <map>              
+#include <unordered_map>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-class Decoration : public sf::Sprite {
-public:
-    Decoration() {}
+struct Decoration {
+    sf::Sprite sprite;
 
-    Decoration(sf::Texture& tileset, sf::IntRect rect) {
-        setTexture(tileset);
-        setTextureRect(rect);
+    Decoration(const sf::Texture& texture, const sf::IntRect& rect, sf::Vector2f position) {
+        sprite.setTexture(texture);
+        sprite.setTextureRect(rect);
+        sprite.setPosition(position);
     }
 };
 
-class Map {
+class Map : public sf::Drawable, public sf::Transformable {
 private:
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
@@ -27,57 +26,53 @@ private:
     sf::Texture tilesetTexture;
     std::vector<Decoration> decorations;
 
-    sf::IntRect tileRect(int tileX, int tileY, int tilesW, int tilesH) {
-        return sf::IntRect(tileX * 16, tileY * 16, tilesW * 16, tilesH * 16);
+    std::unordered_map<std::string, sf::IntRect> catalog;
+
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+        states.transform *= getTransform();
+        target.draw(backgroundSprite, states);
+        for (const auto& deco : decorations) {
+            target.draw(deco.sprite, states);
+        }
     }
 
 public:
-    Map() {
-        const std::string jsonFile = "assets/map.json";
+    Map(const std::string& jsonFile = "assets/map.json") {
         loadFromJson(jsonFile);
     }
 
-    void loadFromJson(const std::string& jsonFile) {
+    bool loadFromJson(const std::string& jsonFile) {
         std::ifstream file(jsonFile);
-        if (!file.is_open()) {
-            throw std::runtime_error("No se pudo abrir " + jsonFile);
-        }
 
         json j;
         file >> j;
 
-        backgroundTexture.loadFromFile(j["background"].get<std::string>());
+        backgroundTexture.loadFromFile(j.value("background", ""));
         backgroundSprite.setTexture(backgroundTexture);
 
-        tilesetTexture.loadFromFile(j["tileset"].get<std::string>());
+        tilesetTexture.loadFromFile(j.value("tileset", ""));
 
-        std::map<std::string, sf::IntRect> catalog;
         for (auto& [name, rectData] : j["catalog"].items()) {
             catalog[name] = sf::IntRect(
-                rectData["tileX"].get<int>() * 16,
-                rectData["tileY"].get<int>() * 16,
-                rectData["tilesW"].get<int>() * 16,
-                rectData["tilesH"].get<int>() * 16
+                rectData.value("tileX", 0) * 16,
+                rectData.value("tileY", 0) * 16,
+                rectData.value("tilesW", 1) * 16,
+                rectData.value("tilesH", 1) * 16
             );
         }
 
         for (auto& decoData : j["decorations"]) {
-            std::string type = decoData["type"].get<std::string>();
-            if (catalog.find(type) != catalog.end()) {
-                Decoration deco(tilesetTexture, catalog[type]);
-                deco.setPosition(
-                    decoData["x"].get<float>(),
-                    decoData["y"].get<float>()
+            std::string type = decoData.value("type", "");
+            auto it = catalog.find(type);
+            if (it != catalog.end()) {
+                sf::Vector2f pos(
+                    decoData.value("x", 0.f),
+                    decoData.value("y", 0.f)
                 );
-                decorations.push_back(deco);
+                decorations.emplace_back(tilesetTexture, it->second, pos);
             }
         }
-    }
 
-    void draw(sf::RenderWindow& window) {
-        window.draw(backgroundSprite);
-        for (auto& deco : decorations) {
-            window.draw(deco); 
-        }
+        return true;
     }
 };

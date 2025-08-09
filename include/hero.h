@@ -32,7 +32,9 @@ private:
     }
 
 public:
-    Hero() = default;
+    Hero(){
+        initActions();
+    }
 
     void initActions() {
         addAction(HeroState::Idle,      "IDLE",      "idle_strip9.png",        {9, 1});

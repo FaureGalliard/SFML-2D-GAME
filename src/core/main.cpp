@@ -18,9 +18,7 @@ int main() {
 
     // Mapa y héroe
     Map map;
-
     Hero hero;
-    hero.initActions();
 
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
@@ -37,7 +35,7 @@ int main() {
 
         // --- Render ---
         window.clear();
-        map.draw(window);  // Primero el mapa
+        window.draw(map);
         window.draw(hero);  // Luego personaje
         window.display();
     }
