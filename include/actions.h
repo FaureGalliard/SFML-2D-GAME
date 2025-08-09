@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdexcept>
 
-class Action {
+class Action : public sf::Drawable, public sf::Transformable {
 private:
     std::vector<sf::Sprite> sprites;
     std::vector<sf::Texture> textures;
@@ -16,21 +16,32 @@ private:
     bool loop;
     bool facingLeft = false;
 
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+        states.transform *= getTransform(); // Aplica posición, rotación, escala
+        for (const auto& sprite : sprites) {
+            target.draw(sprite, states);
+        }
+    }
+
 public:
     Action(const std::vector<std::string>& paths, sf::Vector2i _frameCount, float _frameTime = 0.1f, bool _loop = true)
         : frameCount(_frameCount), frameTime(_frameTime), loop(_loop) {
+
         textures.resize(paths.size());
         sprites.resize(paths.size());
+
         for (size_t i = 0; i < paths.size(); ++i) {
             if (!textures[i].loadFromFile(paths[i])) {
                 throw std::runtime_error("Failed to load texture: " + paths[i]);
             }
             sprites[i].setTexture(textures[i]);
         }
+
         frameSize = {
             static_cast<int>(textures[0].getSize().x) / frameCount.x,
             static_cast<int>(textures[0].getSize().y) / frameCount.y
         };
+
         updateTextureRect();
     }
 
@@ -53,20 +64,8 @@ public:
         sf::IntRect rect(currentFrame.x * frameSize.x, currentFrame.y * frameSize.y, frameSize.x, frameSize.y);
         for (auto& sprite : sprites) {
             sprite.setTextureRect(rect);
-        }
-    }
-
-    void setPosition(float x, float y) {
-        for (auto& sprite : sprites) {
-            sprite.setPosition(x, y);
             sprite.setScale(facingLeft ? -1.f : 1.f, 1.f);
             sprite.setOrigin(facingLeft ? frameSize.x : 0.f, 0.f);
-        }
-    }
-
-    void draw(sf::RenderWindow& window) {
-        for (const auto& sprite : sprites) {
-            window.draw(sprite);
         }
     }
 
@@ -81,6 +80,5 @@ public:
 
     void faceLeft() { facingLeft = true; updateTextureRect(); }
     void faceRight() { facingLeft = false; updateTextureRect(); }
-
     bool isLooping() const { return loop; }
 };

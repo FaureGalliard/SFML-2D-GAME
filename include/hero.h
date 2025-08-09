@@ -5,13 +5,22 @@
 #include "actions.h"
 
 enum class HeroState { Idle, Walking, Hurt, Death, Attack, Axe, Hammering, Roll, Run, Watering, Dig, Mining };
-class Hero : public sf::Transformable {
+
+class Hero : public sf::Drawable, public sf::Transformable {
 private:
     sf::Vector2f velocity;
     float speed = 100.f;
     HeroState currentState = HeroState::Idle;
     std::map<HeroState, std::unique_ptr<Action>> actions;
     bool facingRight = true;
+
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+        states.transform *= getTransform();
+        if (actions.count(currentState)) {
+            target.draw(*actions.at(currentState), states);
+        }
+    }
+
 public:
     Hero() = default;
 
@@ -23,7 +32,6 @@ public:
             basePath + "tools_" + file
         };
         actions[state] = std::make_unique<Action>(paths, frames, frameSpeed, looping);
-        actions[state]->setPosition(getPosition().x, getPosition().y);
     }
 
     void initActions() {
@@ -94,13 +102,12 @@ public:
         }
 
         currentAction->update(dt);
-        currentAction->setPosition(getPosition().x, getPosition().y);
-
+        currentAction->setPosition(getPosition()); 
         if (velocity.x < 0) facingRight = false, currentAction->faceLeft();
         else if (velocity.x > 0) facingRight = true, currentAction->faceRight();
-        else{
-                if (facingRight) currentAction->faceRight();
-                else currentAction->faceLeft();
+        else {
+            if (facingRight) currentAction->faceRight();
+            else currentAction->faceLeft();
         }
     }
 
@@ -109,11 +116,7 @@ public:
             currentState = newState;
             auto* action = actions[currentState].get();
             action->reset();
-            action->setPosition(getPosition().x, getPosition().y); // 🔹 evita parpadeo
+            action->setPosition(getPosition());
         }
-    }
-
-    void draw(sf::RenderWindow& window) {
-        actions[currentState]->draw(window);
     }
 };
