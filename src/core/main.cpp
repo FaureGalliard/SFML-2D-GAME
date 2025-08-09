@@ -37,7 +37,7 @@ int main() {
 
         // --- Render ---
         window.clear();
-        map.draw(window);   // Fondo primero
+        map.draw(window);  // Primero el mapa
         window.draw(hero);  // Luego personaje
         window.display();
     }
