@@ -44,20 +44,17 @@ public:
     void handleInput(float dt) {
         sf::Vector2f dir(0.f, 0.f);
 
-        // Movimiento direccional
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) dir.x -= 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) dir.x += 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) dir.y -= 1.f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) dir.y += 1.f;
 
-        // Velocidad
         float currentSpeed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ? speed * 2.f : speed;
         velocity = dir * currentSpeed;
         move(velocity * dt);
 
         Action* currentAction = actions[currentState].get();
 
-        // Mapa de teclas y estados especiales
         const std::vector<std::pair<sf::Keyboard::Key, HeroState>> keyActions = {
             {sf::Keyboard::Space, HeroState::Attack},
             {sf::Keyboard::E,     HeroState::Axe},
@@ -72,19 +69,17 @@ public:
 
         bool actionTriggered = false;
 
-        // Detectar acción especial
         if (currentAction->isLooping()) {
             for (auto& [key, state] : keyActions) {
                 if (sf::Keyboard::isKeyPressed(key)) {
                     setState(state);
-                    currentAction = actions[currentState].get(); // recargar puntero
+                    currentAction = actions[currentState].get(); 
                     actionTriggered = true;
                     break;
                 }
             }
         }
 
-        // Si no hay acción especial, elegir Idle / Walk / Run
         if (!actionTriggered) {
             bool moving = dir != sf::Vector2f(0.f, 0.f);
             HeroState targetState =
@@ -98,11 +93,9 @@ public:
             }
         }
 
-        // Actualizar animación
         currentAction->update(dt);
         currentAction->setPosition(getPosition().x, getPosition().y);
 
-        // Dirección
         if (velocity.x < 0) facingRight = false, currentAction->faceLeft();
         else if (velocity.x > 0) facingRight = true, currentAction->faceRight();
         else{

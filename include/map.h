@@ -9,22 +9,14 @@
 
 using json = nlohmann::json;
 
-class Decoration {
+class Decoration : public sf::Sprite {
 public:
     Decoration() {}
+
     Decoration(sf::Texture& tileset, sf::IntRect rect) {
-        sprite.setTexture(tileset);
-        sprite.setTextureRect(rect);
+        setTexture(tileset);
+        setTextureRect(rect);
     }
-
-    void setPosition(float x, float y) {
-        sprite.setPosition(x, y);
-    }
-
-    sf::Sprite& getSprite() { return sprite; }
-
-private:
-    sf::Sprite sprite;
 };
 
 class Map {
@@ -85,7 +77,7 @@ public:
     void draw(sf::RenderWindow& window) {
         window.draw(backgroundSprite);
         for (auto& deco : decorations) {
-            window.draw(deco.getSprite());
+            window.draw(deco); 
         }
     }
 };
