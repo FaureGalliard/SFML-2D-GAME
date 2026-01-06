@@ -16,7 +16,8 @@ link_directories(
 
 )
 add_executable(ProjectSFML ${SOURCES} ${HEADERS}
-       )
+        include/chunk.h
+)
 
 target_link_libraries(ProjectSFML
         sfml-graphics

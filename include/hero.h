@@ -1,3 +1,4 @@
+//hero.h
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <map>
@@ -9,9 +10,10 @@ enum class HeroState { Idle, Walking, Hurt, Death, Attack, Axe, Hammering, Roll,
 class Hero : public sf::Drawable, public sf::Transformable {
 private:
     sf::Vector2f velocity;
-    float speed = 100.f;
+    float speed = 50.f;
     HeroState currentState = HeroState::Idle;
     std::map<HeroState, std::unique_ptr<Action>> actions;
+    bool facingLeft = false;
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
         states.transform *= getTransform();
@@ -96,8 +98,23 @@ public:
         action->update(dt);
         action->setPosition(getPosition());
 
-        if (velocity.x < 0) action->faceLeft();
-        else if (velocity.x > 0) action->faceRight();
+        // Manejo de orientación del sprite
+        if (velocity.x < 0) {
+            facingLeft = true;
+            action->faceLeft();
+        }
+        else if (velocity.x > 0) {
+            facingLeft = false;
+            action->faceRight();
+        }
+        else {
+            // Cuando no hay movimiento horizontal, mantiene la última orientación
+            if (facingLeft) {
+                action->faceLeft();
+            } else {
+                action->faceRight();
+            }
+        }
     }
 
     void setState(HeroState newState) {
@@ -106,6 +123,12 @@ public:
             auto* action = actions[currentState].get();
             action->reset();
             action->setPosition(getPosition());
+            // Aplica la orientación guardada a la nueva acción
+            if (facingLeft) {
+                action->faceLeft();
+            } else {
+                action->faceRight();
+            }
         }
     }
 };

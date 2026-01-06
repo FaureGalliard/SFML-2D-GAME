@@ -6,7 +6,7 @@ int main() {
     const int GAME_WIDTH = 512;  // Resolución base
     const int GAME_HEIGHT = 288;
 
-    sf::RenderWindow window(sf::VideoMode(GAME_WIDTH * 2, GAME_HEIGHT * 2), "Mi primer juego con SFML");
+    sf::RenderWindow window(sf::VideoMode(GAME_WIDTH * 2, GAME_HEIGHT * 2), "SaveTheValley");
     window.setFramerateLimit(60);
 
     // Vista base (para escalado)
@@ -17,7 +17,7 @@ int main() {
     sf::Clock clock;
 
     // Mapa y héroe
-    Map map;
+    //Map map;
     Hero hero;
 
     while (window.isOpen()) {
@@ -35,7 +35,7 @@ int main() {
 
         // --- Render ---
         window.clear();
-        window.draw(map);
+
         window.draw(hero);  // Luego personaje
         window.display();
     }
