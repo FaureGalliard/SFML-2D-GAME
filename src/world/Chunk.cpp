@@ -14,5 +14,5 @@ void Chunk::generate() {
 }
 
 const Tile& Chunk::getTile(int x, int y) const{
-    return tiles[x][y];
+    return tiles[y][x];
 }

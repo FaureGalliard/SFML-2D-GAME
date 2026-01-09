@@ -16,11 +16,13 @@ sf::IntRect WorldRenderer::pickTileRect(const Tile& tile) const {
         case TileType::Grass: {
             int variant = std::rand() % 2;
             return variant == 0
-                ? tileset.get(1, 1)
-                : tileset.get(1, 2);
+                ? tileset.get(2, 1)
+                : tileset.get(1, 1);
         }
         case TileType::Water:
-            return tileset.get(2, 1);
+            return tileset.get(5, 1);
+        case TileType::Sand:
+            return tileset.get(4, 1);
 
     }
     return tileset.get(0, 0);
