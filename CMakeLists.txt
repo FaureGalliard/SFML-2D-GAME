@@ -30,6 +30,7 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/render/Tileset.h
         src/render/WorldRenderer.cpp
         src/render/WorldRenderer.h
+        src/world/Noise.cpp
 )
 
 target_link_libraries(ProjectSFML
