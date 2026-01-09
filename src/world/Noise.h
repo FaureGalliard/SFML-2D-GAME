@@ -3,6 +3,9 @@
 
 class Noise {
 public:
-    static float value(int x,int y,int seed);
+    explicit Noise(int seed);
+    float simplex(float x, float y) const;
 
+private:
+    int seed;
 };

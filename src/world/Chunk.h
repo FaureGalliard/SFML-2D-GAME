@@ -3,7 +3,7 @@
 class Chunk {
 
     public:
-        static constexpr int SIZE = 16;
+        static constexpr int SIZE = 32;
         Chunk(int cx,int cy);
         const Tile& getTile(int x, int y) const;
 
