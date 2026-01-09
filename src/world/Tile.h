@@ -8,4 +8,5 @@ struct Tile{
 
     TileType type;
     uint8_t variant = 0;
+    uint8_t mask;
 };

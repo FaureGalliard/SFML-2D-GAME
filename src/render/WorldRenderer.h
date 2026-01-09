@@ -12,6 +12,7 @@ public:
 private:
     const Tileset& tileset;
     sf::IntRect pickTileRect(const Tile& tile) const;
+    sf::IntRect pickBasic(const Tile& tile) const;
 };
 
 

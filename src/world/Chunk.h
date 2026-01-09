@@ -1,6 +1,5 @@
 #pragma once
 #include "world/Tile.h"
-
 class Chunk {
 
     public:
@@ -12,5 +11,7 @@ class Chunk {
         int cx,cy;
         Tile tiles[SIZE][SIZE];
         void generate();
-
+        bool sameType(int x,int y, TileType t) const;
+        uint8_t computeMask(int x, int y) const;
+        void finalizeAutoTiling();
 };
