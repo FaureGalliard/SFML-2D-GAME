@@ -4,7 +4,7 @@ project(ProjectSFML)
 set(CMAKE_CXX_STANDARD 20)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp")
+file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp src/*h")
 
 include_directories(
         include
@@ -16,7 +16,20 @@ link_directories(
 
 )
 add_executable(ProjectSFML ${SOURCES} ${HEADERS}
-        include/chunk.h
+        src/core/Game.cpp
+        src/core/Game.h
+        src/world/World.cpp
+        src/world/World.h
+        src/world/Chunk.cpp
+        src/world/Chunk.h
+        src/world/Tile.h
+        src/world/Noise.h
+        src/world/worldObject.cpp
+        src/world/worldObject.h
+        src/render/Tileset.cpp
+        src/render/Tileset.h
+        src/render/WorldRenderer.cpp
+        src/render/WorldRenderer.h
 )
 
 target_link_libraries(ProjectSFML
@@ -30,6 +43,9 @@ target_link_libraries(ProjectSFML
 target_include_directories(ProjectSFML PRIVATE
         "include"
         "C:/Program Files/nlohmann"
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/include
+
 )
 
 set(SFML_DLLS
