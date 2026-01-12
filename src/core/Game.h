@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "world/World.h"
 #include "render/WorldRenderer.h"
 #include "render/Tileset.h"
 #include "entities/Hero.h"

@@ -3,7 +3,6 @@
 //
 
 #include "World.h"
-#include <cmath>
 #include <unordered_set>
 
 static int floorDiv(int a, int b) {
@@ -47,10 +46,16 @@ void World::update(int playerTileX,int playerTileY) {
 }
 
 void World::loadChunk(int cx, int cy) {
-    ChunkCoord key{cx, cy};
-    chunks.emplace(key, std::make_unique<Chunk>(cx, cy));
-}
+    auto chunk = std::make_unique<Chunk>(cx, cy, *this);
+    chunks[{cx, cy}] = std::move(chunk);
 
+    for (int dy = -1; dy <= 1; ++dy)
+        for (int dx = -1; dx <= 1; ++dx) {
+            auto it = chunks.find({cx + dx, cy + dy});
+            if (it != chunks.end())
+                it->second->finalizeAutoTiling();
+        }
+}
 
 const std::unordered_map<
     ChunkCoord,
@@ -58,4 +63,20 @@ const std::unordered_map<
     ChunkCoordHash>&
 World::getChunks() const {
     return chunks;
+}
+
+const Tile* World::getTileGlobal(int wx, int wy) const {
+    int cx = floorDiv(wx, Chunk::SIZE);
+    int cy = floorDiv(wy, Chunk::SIZE);
+
+    int tx = wx - cx * Chunk::SIZE;
+    int ty = wy - cy * Chunk::SIZE;
+
+
+
+    auto it = chunks.find({cx, cy});
+    if (it == chunks.end())
+        return nullptr;
+
+    return &it->second->getTile(tx, ty);
 }

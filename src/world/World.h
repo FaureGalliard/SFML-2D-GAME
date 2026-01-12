@@ -25,6 +25,7 @@ public:
     const std::unordered_map<ChunkCoord,
     std::unique_ptr<Chunk>,ChunkCoordHash>&
     getChunks() const;
+    const Tile* getTileGlobal(int wx, int wy) const;
 private:
     static constexpr int LOAD_RADIUS = 2;
     std::unordered_map<ChunkCoord,std::unique_ptr<Chunk>,ChunkCoordHash> chunks;

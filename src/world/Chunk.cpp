@@ -1,16 +1,16 @@
 
 #include "Chunk.h"
 #include "Noise.h"
-#include <cstdlib>
 #include "render/WorldRenderer.h"
-static constexpr int WORLD_SEED = 1342;
+#include "world/World.h"
+static constexpr int WORLD_SEED = 1340;
 static Noise noise(WORLD_SEED);
 
 constexpr int TILE_SIZE = 16;
 
 
-Chunk::Chunk(int cx, int cy)
-    : cx(cx), cy(cy), mesh(sf::Quads)
+Chunk::Chunk(int cx, int cy, const World& world)
+    : world(world), cx(cx), cy(cy), mesh(sf::Quads)
 {
     generate();
     finalizeAutoTiling();
@@ -94,9 +94,11 @@ void Chunk::buildMesh(const WorldRenderer& renderer) {
 
 
 bool Chunk::sameType(int x, int y, TileType t) const {
-    if (x < 0 || y < 0 || x >= SIZE || y >= SIZE)
-        return false;
-    return tiles[y][x].type == t;
+    int wx = cx * SIZE + x;
+    int wy = cy * SIZE + y;
+
+    const Tile* tile = world.getTileGlobal(wx, wy);
+    return tile && tile->type == t;
 }
 
 const sf::VertexArray& Chunk::getMesh() const {

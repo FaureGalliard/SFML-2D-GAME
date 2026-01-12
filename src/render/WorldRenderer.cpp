@@ -3,8 +3,10 @@
 //
 
 #include "WorldRenderer.h"
-#include <cstdlib>
+#include "Tileset.h"
+#include "world/Chunk.h"
 #include "world/Tile.h"
+#include "world/World.h"
 
 WorldRenderer::WorldRenderer(const Tileset& tileset) : tileset(tileset){
 
@@ -42,27 +44,15 @@ sf::IntRect WorldRenderer::pickBasic(const Tile& tile) const {
     }
 }
 
-void WorldRenderer::drawChunk(sf::RenderWindow& window,
-                              const Chunk& chunk) {
-
+void WorldRenderer::draw(sf::RenderWindow& window, const World& world) {
     sf::RenderStates states;
     states.texture = &tileset.texture();
 
-    window.draw(chunk.getMesh(), states);
-}
+    for (const auto& [coord, chunkPtr] : world.getChunks()) {
+        Chunk& chunk = *chunkPtr;
 
-void WorldRenderer::draw(sf::RenderWindow& window,
-                         const World& world) {
-
-    sf::RenderStates states;
-    states.texture = &tileset.texture();
-
-    for (const auto& pair : world.getChunks()) {
-        Chunk& chunk = *pair.second;
-
-        if (!chunk.isMeshBuilt()) {
+        if (!chunk.isMeshBuilt())
             chunk.buildMesh(*this);
-        }
 
         window.draw(chunk.getMesh(), states);
     }
