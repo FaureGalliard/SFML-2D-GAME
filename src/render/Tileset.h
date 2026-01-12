@@ -6,7 +6,7 @@ class Tileset {
 
 public:
     bool load(const std::string& path);
-    sf::IntRect get(int tx,int ty) const;
+    sf::IntRect get(int tx, int ty, int w = 1, int h = 1) const;
     const sf::Texture& texture() const;
 
 private:

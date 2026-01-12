@@ -2,6 +2,7 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include "world/Tile.h"
 #include "worldobjects/WorldObject.h"
+#include <array>
 class WorldRenderer;
 class World;
 
@@ -23,6 +24,7 @@ public:
         const std::vector<WorldObject>& getWorldObjects() const {
             return worldObjects;
         }
+        std::array<std::array<bool, SIZE>, SIZE> occupied{};
     private:
 
         const World& world;
@@ -31,7 +33,6 @@ public:
         Tile tiles[SIZE][SIZE];
 
         sf::VertexArray mesh;
-
         bool sameType(int x,int y, TileType t) const;
         uint8_t computeMask(int x, int y) const;
 

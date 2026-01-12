@@ -4,10 +4,13 @@
 #include "render/WorldRenderer.h"
 
 static const std::vector<SpawnRule> rules = {
-    { WorldObjectType::Flower, { TileType::Grass }, 0.12f },
-    { WorldObjectType::Rock,   { TileType::Grass, TileType::Sand }, 0.05f },
-    {WorldObjectType::GrassTuft, { TileType::Grass }, 0.12f },
-    {WorldObjectType::Mushroom, { TileType::Grass }, 0.12f },
+    { WorldObjectType::Flower, { TileType::Grass }, 0.005f },
+    { WorldObjectType::Rock,   { TileType::Grass, TileType::Sand }, 0.006f },
+    {WorldObjectType::GrassTuft, { TileType::Grass }, 0.005f },
+    {WorldObjectType::Mushroom, { TileType::Grass }, 0.005f },
+    {WorldObjectType::Tree1x3, { TileType::Grass }, 0.004 },
+    {WorldObjectType::Bush,{TileType::Grass },0.003},
+    {WorldObjectType::Tree2x3,{TileType::Grass },0.005}
 };
 
 const std::vector<SpawnRule>& getAllSpawnRules() {

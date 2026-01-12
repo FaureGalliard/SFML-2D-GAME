@@ -4,10 +4,13 @@
 #include "render/WorldRenderer.h"
 #include "world/World.h"
 #include "worldobjects/SpawnRules.h"
-#include "worldobjects/WorldObject.h"
 #include "core/Config.h"
+#include <random>
 
-static constexpr int WORLD_SEED = 1340;
+static std::mt19937 rng(12345);
+static std::uniform_real_distribution<float> dist(0.f, 1.f);
+
+static constexpr int WORLD_SEED = 1341;
 static Noise noise(WORLD_SEED);
 
 Chunk::Chunk(int cx, int cy, const World& world)
@@ -137,37 +140,42 @@ int Chunk::getCY() const {
 }
 
 
-    void Chunk::generateObjects() {
-        for (int y = 0; y < SIZE; ++y) {
-            for (int x = 0; x < SIZE; ++x) {
+void Chunk::generateObjects() {
+    for (int y = 0; y < SIZE; ++y) {
+        for (int x = 0; x < SIZE; ++x) {
 
-                TileType ground = tiles[y][x].type;
+            TileType ground = tiles[y][x].type;
 
-                float n = noise.simplex(
-                    (cx * SIZE + x + 10000) / 8.f,
-                    (cy * SIZE + y + 10000) / 8.f
+
+            if (occupied[y][x])
+                continue;
+
+            float densityNoise = noise.simplex(
+                (cx * SIZE + x + 10000) / 8.f,
+                (cy * SIZE + y + 10000) / 8.f
+            );
+            densityNoise = (densityNoise + 1.f) * 0.5f;
+
+            for (const SpawnRule& rule : getAllSpawnRules()) {
+
+                if (!canSpawn(rule.type, ground))
+                    continue;
+
+                float r = dist(rng);
+                if (r > rule.probability)
+                    continue;
+
+                worldObjects.emplace_back(
+                    rule.type,
+                    uint8_t(r * 4),
+                    x, y
                 );
-                n = (n + 1.f) * 0.5f;
 
-                for (const SpawnRule& rule : getAllSpawnRules()) {
-
-                    if (!canSpawn(rule.type, ground))
-                        continue;
-
-                    if (n < rule.probability)
-                        continue;
-
-                    worldObjects.emplace_back(
-                        rule.type,
-                        uint8_t(rand() % 4),
-                        x, y
-                    );
-
-                    break;
-                }
+                occupied[y][x] = true;
+                break;
             }
         }
     }
-
+}
 
 
