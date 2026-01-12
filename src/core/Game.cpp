@@ -1,15 +1,21 @@
 #include "Game.h"
 #include "render/WorldRenderer.h"
-#include "world/chunk.h"
-Game::Game() : window(sf::VideoMode(1280, 720), L"Save the Valley"),tileset(),worldRenderer(tileset),chunk(0,0)
+
+static constexpr int TILE_SIZE = 16;
+
+Game::Game()
+    : window(sf::VideoMode(1280, 720), "Save the Valley"),
+      tileset(),
+      world(),
+      worldRenderer(tileset)
 {
     window.setFramerateLimit(60);
+
     if (!tileset.load(
         "assets/Sunnyside_World_Assets/Tileset/spr_tileset_sunnysideworld_16px.png"
     )) {
         throw std::runtime_error("Failed to load tileset");
     }
-
 }
 
 void Game::run() {
@@ -37,11 +43,16 @@ void Game::processEvents() {
 
 void Game::update(float dt) {
 
+   hero.update(dt);
+
+
+    world.update(hero.getTileX(), hero.getTileY());
+
 }
 
 void Game::render() {
     window.clear();
 
-    worldRenderer.draw(window, chunk);
+    worldRenderer.draw(window, world);
     window.display();
 }

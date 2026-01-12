@@ -31,6 +31,16 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/render/WorldRenderer.cpp
         src/render/WorldRenderer.h
         src/world/Noise.cpp
+        src/systems/InputSystem.cpp
+        src/systems/InputSystem.h
+        src/render/EntityRenderer.cpp
+        src/render/EntityRenderer.h
+        src/render/Animation.h
+        src/render/Camera.h
+        src/entities/Hero.cpp
+        src/entities/Hero.h
+
+        src/core/Config.h
 )
 
 target_link_libraries(ProjectSFML

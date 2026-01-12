@@ -1,16 +1,16 @@
-//
-// Created by angel on 8/01/2026.
-//
 
 #include "Chunk.h"
 #include "Noise.h"
 #include <cstdlib>
-
+#include "render/WorldRenderer.h"
 static constexpr int WORLD_SEED = 1342;
 static Noise noise(WORLD_SEED);
 
+constexpr int TILE_SIZE = 16;
+
+
 Chunk::Chunk(int cx, int cy)
-    : cx(cx), cy(cy)
+    : cx(cx), cy(cy), mesh(sf::Quads)
 {
     generate();
     finalizeAutoTiling();
@@ -34,11 +34,11 @@ void Chunk::generate() {
 
             Tile& tile = tiles[y][x];
 
-            if (n < 0.18f) {
+            if (n < 0.23f) {
                 tile.type = TileType::Water;
                 tile.variant = 0;
             }
-            else if (n < 0.42f) {
+            else if (n < 0.32f) {
                 tile.type = TileType::Sand;
                 tile.variant = 0;
             }
@@ -58,12 +58,51 @@ const Tile& Chunk::getTile(int x, int y) const {
     return tiles[y][x];
 }
 
+void Chunk::buildMesh(const WorldRenderer& renderer) {
+    mesh.clear();
+    mesh.setPrimitiveType(sf::Quads);
+    mesh.resize(SIZE * SIZE * 4);
+
+    int i = 0;
+
+    for (int y = 0; y < SIZE; ++y) {
+        for (int x = 0; x < SIZE; ++x) {
+
+            const Tile& tile = tiles[y][x];
+            sf::IntRect tex = renderer.pickTileRect(tile);
+
+            float px = (cx * SIZE + x) * TILE_SIZE;
+            float py = (cy * SIZE + y) * TILE_SIZE;
+
+            sf::Vertex* q = &mesh[i * 4];
+
+            q[0].position = {px, py};
+            q[1].position = {px + TILE_SIZE, py};
+            q[2].position = {px + TILE_SIZE, py + TILE_SIZE};
+            q[3].position = {px, py + TILE_SIZE};
+
+            q[0].texCoords = {float(tex.left), float(tex.top)};
+            q[1].texCoords = {float(tex.left + tex.width), float(tex.top)};
+            q[2].texCoords = {float(tex.left + tex.width), float(tex.top + tex.height)};
+            q[3].texCoords = {float(tex.left), float(tex.top + tex.height)};
+
+            ++i;
+        }
+    }
+    meshBuilt = true;
+}
+
 
 bool Chunk::sameType(int x, int y, TileType t) const {
     if (x < 0 || y < 0 || x >= SIZE || y >= SIZE)
         return false;
     return tiles[y][x].type == t;
 }
+
+const sf::VertexArray& Chunk::getMesh() const {
+    return mesh;
+}
+
 
 uint8_t Chunk::computeMask(int x, int y) const {
 
@@ -83,4 +122,12 @@ void Chunk::finalizeAutoTiling() {
     for (int y = 0; y < SIZE; ++y)
         for (int x = 0; x < SIZE; ++x)
             tiles[y][x].mask = computeMask(x, y);
+}
+
+int Chunk::getCX() const {
+    return cx;
+}
+
+int Chunk::getCY() const {
+    return cy;
 }

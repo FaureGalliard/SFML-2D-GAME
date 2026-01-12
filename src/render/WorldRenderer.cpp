@@ -42,19 +42,28 @@ sf::IntRect WorldRenderer::pickBasic(const Tile& tile) const {
     }
 }
 
+void WorldRenderer::drawChunk(sf::RenderWindow& window,
+                              const Chunk& chunk) {
 
-void WorldRenderer::draw(sf::RenderWindow& window, const Chunk& chunk) {
-    sf::Sprite sprite;
-    sprite.setTexture(tileset.texture());
+    sf::RenderStates states;
+    states.texture = &tileset.texture();
 
-    for (int y = 0; y < Chunk::SIZE; ++y) {
-        for (int x = 0; x < Chunk::SIZE; ++x) {
-            const Tile& tile = chunk.getTile(x, y);
+    window.draw(chunk.getMesh(), states);
+}
 
-            sprite.setTextureRect(pickTileRect(tile));
-            sprite.setPosition(x * 16.f, y * 16.f);
+void WorldRenderer::draw(sf::RenderWindow& window,
+                         const World& world) {
 
-            window.draw(sprite);
+    sf::RenderStates states;
+    states.texture = &tileset.texture();
+
+    for (const auto& pair : world.getChunks()) {
+        Chunk& chunk = *pair.second;
+
+        if (!chunk.isMeshBuilt()) {
+            chunk.buildMesh(*this);
         }
+
+        window.draw(chunk.getMesh(), states);
     }
 }

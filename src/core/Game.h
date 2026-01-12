@@ -1,26 +1,26 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
 #include "render/WorldRenderer.h"
 #include "render/Tileset.h"
-#include "world/Chunk.h"
+#include "entities/Hero.h"
 class Game {
 
 public:
     Game();
     void run();
+
+private:
     void processEvents();
     void update(float dt);
     void render();
-
-private:
     sf::RenderWindow window;
     sf::Clock clock;
     bool running = true;
 
     Tileset tileset;
+    World world;
     WorldRenderer worldRenderer;
-    Chunk chunk;
+    Hero hero;
 };
 
 

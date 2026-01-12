@@ -1,0 +1,8 @@
+//
+// Created by angel on 9/01/2026.
+//
+
+#ifndef PROJECTSFML_ANIMATION_H
+#define PROJECTSFML_ANIMATION_H
+
+#endif //PROJECTSFML_ANIMATION_H
