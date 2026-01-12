@@ -9,6 +9,6 @@ struct SpawnRule {
     std::vector<TileType> allowed;
     float probability;
 };
-
+const std::vector<SpawnRule>& getAllSpawnRules();
 bool canSpawn(WorldObjectType type, TileType tile);
 const SpawnRule* getSpawnRule(WorldObjectType type);

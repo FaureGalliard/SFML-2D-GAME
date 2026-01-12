@@ -22,3 +22,4 @@ struct WorldObject {
           tileX(static_cast<uint8_t>(x)),
           tileY(static_cast<uint8_t>(y)) {}
 };
+

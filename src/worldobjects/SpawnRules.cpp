@@ -10,6 +10,11 @@ static const std::vector<SpawnRule> rules = {
     {WorldObjectType::Mushroom, { TileType::Grass }, 0.12f },
 };
 
+const std::vector<SpawnRule>& getAllSpawnRules() {
+    return rules;
+}
+
+
 const SpawnRule* getSpawnRule(WorldObjectType type) {
     for (const auto& r : rules)
         if (r.type == type)

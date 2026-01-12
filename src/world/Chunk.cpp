@@ -149,7 +149,7 @@ int Chunk::getCY() const {
                 );
                 n = (n + 1.f) * 0.5f;
 
-                for (const SpawnRule& rule : rules) {
+                for (const SpawnRule& rule : getAllSpawnRules()) {
 
                     if (!canSpawn(rule.type, ground))
                         continue;
