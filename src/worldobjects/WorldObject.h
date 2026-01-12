@@ -5,9 +5,9 @@ enum class WorldObjectType : uint8_t {
     GrassTuft,
     Flower,
     RockSmall,
-    Bush,
     TreeSmall,
-    Rock
+    Rock,
+    Mushroom
 };
 
 struct WorldObject {

@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "render/WorldRenderer.h"
-
-static constexpr int TILE_SIZE = 16;
+#include "core/Config.h"
 
 Game::Game()
     : window(sf::VideoMode(1280, 720), "Save the Valley"),

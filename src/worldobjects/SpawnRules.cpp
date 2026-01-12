@@ -1,10 +1,13 @@
 // SpawnRules.cpp
 #include "SpawnRules.h"
 
+#include "render/WorldRenderer.h"
+
 static const std::vector<SpawnRule> rules = {
     { WorldObjectType::Flower, { TileType::Grass }, 0.12f },
     { WorldObjectType::Rock,   { TileType::Grass, TileType::Sand }, 0.05f },
-    { WorldObjectType::Bush,   { TileType::Grass }, 0.08f }
+    {WorldObjectType::GrassTuft, { TileType::Grass }, 0.12f },
+    {WorldObjectType::Mushroom, { TileType::Grass }, 0.12f },
 };
 
 const SpawnRule* getSpawnRule(WorldObjectType type) {

@@ -6,6 +6,7 @@
 #include "worldobjects/SpawnRules.h"
 #include "worldobjects/WorldObject.h"
 #include "core/Config.h"
+
 static constexpr int WORLD_SEED = 1340;
 static Noise noise(WORLD_SEED);
 
@@ -14,6 +15,7 @@ Chunk::Chunk(int cx, int cy, const World& world)
 {
     generate();
     finalizeAutoTiling();
+    generateObjects();
 }
 
 void Chunk::generate() {
@@ -53,6 +55,8 @@ void Chunk::generate() {
         }
     }
 }
+
+
 
 const Tile& Chunk::getTile(int x, int y) const {
     return tiles[y][x];
@@ -132,29 +136,38 @@ int Chunk::getCY() const {
     return cy;
 }
 
-void Chunk::generateObjects() {
-    for (int y = 0; y < SIZE; ++y) {
-        for (int x = 0; x < SIZE; ++x) {
 
-            TileType ground = tiles[y][x].type;
+    void Chunk::generateObjects() {
+        for (int y = 0; y < SIZE; ++y) {
+            for (int x = 0; x < SIZE; ++x) {
 
-            float n = noise.simplex(
-                (cx * SIZE + x) / 10.f,
-                (cy * SIZE + y) / 10.f
-            );
+                TileType ground = tiles[y][x].type;
 
-            if (n > 0.8f) {
-                WorldObjectType type = WorldObjectType::Flower;
+                float n = noise.simplex(
+                    (cx * SIZE + x + 10000) / 8.f,
+                    (cy * SIZE + y + 10000) / 8.f
+                );
+                n = (n + 1.f) * 0.5f;
 
-                if (!canSpawn(type, ground))
-                    continue;
+                for (const SpawnRule& rule : rules) {
+
+                    if (!canSpawn(rule.type, ground))
+                        continue;
+
+                    if (n < rule.probability)
+                        continue;
 
                     worldObjects.emplace_back(
-                    type,
-                uint8_t(rand() % 4),
-                    x, y
-                );
+                        rule.type,
+                        uint8_t(rand() % 4),
+                        x, y
+                    );
+
+                    break;
+                }
             }
         }
     }
-}
+
+
+

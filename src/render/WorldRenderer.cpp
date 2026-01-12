@@ -44,6 +44,41 @@ sf::IntRect WorldRenderer::pickBasic(const Tile& tile) const {
     }
 }
 
+sf::IntRect WorldRenderer::pickObjectRect(const WorldObject& obj) const {
+    switch (obj.type) {
+        case WorldObjectType::Flower:
+            return tileset.get(31 , 1);
+
+        case WorldObjectType::Rock:
+            return tileset.get(31 , 4);
+        case WorldObjectType::GrassTuft:
+            return tileset.get(27 , 1);
+
+        default:
+            return tileset.get(51, 32);
+    }
+}
+
+
+void WorldRenderer::drawWorldObjects(sf::RenderWindow& window,
+                                     const Chunk& chunk) {
+    sf::Sprite sprite;
+    sprite.setTexture(tileset.texture());
+
+    for (const WorldObject& obj : chunk.getWorldObjects()) {
+
+        sf::IntRect tex = pickObjectRect(obj);
+        sprite.setTextureRect(tex);
+
+        float wx = (chunk.getCX() * Chunk::SIZE + obj.tileX) * TILE_SIZE;
+        float wy = (chunk.getCY() * Chunk::SIZE + obj.tileY) * TILE_SIZE;
+
+        sprite.setPosition(wx, wy);
+
+        window.draw(sprite);
+    }
+}
+
 void WorldRenderer::draw(sf::RenderWindow& window, const World& world) {
     sf::RenderStates states;
     states.texture = &tileset.texture();
@@ -55,5 +90,8 @@ void WorldRenderer::draw(sf::RenderWindow& window, const World& world) {
             chunk.buildMesh(*this);
 
         window.draw(chunk.getMesh(), states);
+        drawWorldObjects(window, chunk);
     }
+
+
 }

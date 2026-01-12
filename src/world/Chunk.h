@@ -20,6 +20,9 @@ public:
         void finalizeAutoTiling();
         std::vector<WorldObject> worldObjects;
         void generateObjects();
+        const std::vector<WorldObject>& getWorldObjects() const {
+            return worldObjects;
+        }
     private:
 
         const World& world;
