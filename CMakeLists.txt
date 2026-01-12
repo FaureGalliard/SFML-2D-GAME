@@ -24,8 +24,7 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/world/Chunk.h
         src/world/Tile.h
         src/world/Noise.h
-        src/world/worldObject.cpp
-        src/world/worldObject.h
+        src/worldobjects/WorldObject.h
         src/render/Tileset.cpp
         src/render/Tileset.h
         src/render/WorldRenderer.cpp
@@ -41,6 +40,8 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/entities/Hero.h
 
         src/core/Config.h
+        src/worldobjects/SpawnRules.cpp
+        src/worldobjects/SpawnRules.h
 )
 
 target_link_libraries(ProjectSFML

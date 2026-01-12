@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics/VertexArray.hpp>
 #include "world/Tile.h"
+#include "worldobjects/WorldObject.h"
 class WorldRenderer;
 class World;
 
@@ -17,8 +18,8 @@ public:
         bool isMeshBuilt() const { return meshBuilt; }
         void buildMesh(const WorldRenderer& renderer);
         void finalizeAutoTiling();
-
-
+        std::vector<WorldObject> worldObjects;
+        void generateObjects();
     private:
 
         const World& world;

@@ -3,11 +3,11 @@
 #include "Noise.h"
 #include "render/WorldRenderer.h"
 #include "world/World.h"
+#include "worldobjects/SpawnRules.h"
+#include "worldobjects/WorldObject.h"
+#include "core/Config.h"
 static constexpr int WORLD_SEED = 1340;
 static Noise noise(WORLD_SEED);
-
-constexpr int TILE_SIZE = 16;
-
 
 Chunk::Chunk(int cx, int cy, const World& world)
     : world(world), cx(cx), cy(cy), mesh(sf::Quads)
@@ -92,7 +92,6 @@ void Chunk::buildMesh(const WorldRenderer& renderer) {
     meshBuilt = true;
 }
 
-
 bool Chunk::sameType(int x, int y, TileType t) const {
     int wx = cx * SIZE + x;
     int wy = cy * SIZE + y;
@@ -104,7 +103,6 @@ bool Chunk::sameType(int x, int y, TileType t) const {
 const sf::VertexArray& Chunk::getMesh() const {
     return mesh;
 }
-
 
 uint8_t Chunk::computeMask(int x, int y) const {
 
@@ -132,4 +130,31 @@ int Chunk::getCX() const {
 
 int Chunk::getCY() const {
     return cy;
+}
+
+void Chunk::generateObjects() {
+    for (int y = 0; y < SIZE; ++y) {
+        for (int x = 0; x < SIZE; ++x) {
+
+            TileType ground = tiles[y][x].type;
+
+            float n = noise.simplex(
+                (cx * SIZE + x) / 10.f,
+                (cy * SIZE + y) / 10.f
+            );
+
+            if (n > 0.8f) {
+                WorldObjectType type = WorldObjectType::Flower;
+
+                if (!canSpawn(type, ground))
+                    continue;
+
+                    worldObjects.emplace_back(
+                    type,
+                uint8_t(rand() % 4),
+                    x, y
+                );
+            }
+        }
+    }
 }
