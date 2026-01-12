@@ -12,7 +12,9 @@ struct ChunkCoord {
 
 struct ChunkCoordHash {
     std::size_t operator()(const ChunkCoord& c) const {
-        return std::hash<int>()(c.x)^(std::hash<int>()(c.y)<<1);
+        std::size_t h1 = std::hash<int>{}(c.x);
+        std::size_t h2 = std::hash<int>{}(c.y);
+        return h1 ^ (h2 + 0x9e3779b97f4a7c15ULL + (h1 << 6) + (h1 >> 2));
     }
 };
 
@@ -27,5 +29,4 @@ private:
     static constexpr int LOAD_RADIUS = 2;
     std::unordered_map<ChunkCoord,std::unique_ptr<Chunk>,ChunkCoordHash> chunks;
     void loadChunk(int cx,int cy);
-    void unloadFarChunks(int centerCx,int centerCy);
 };
