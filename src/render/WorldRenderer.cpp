@@ -47,15 +47,15 @@ sf::IntRect WorldRenderer::pickBasic(const Tile& tile) const {
 sf::IntRect WorldRenderer::pickObjectRect(const WorldObject& obj) const {
     switch (obj.type) {
         case WorldObjectType::Flower: {
-            int cols = 4;          // 31,32,33,34
-            int rows = 3;          // y = 1,2,3
+            int cols = 4;
+            int rows = 3;
             int startX = 31;
             int startY = 1;
 
-            int v = obj.variant % (cols * rows); // aseguras que siempre está en rango
+            int v = obj.variant % (cols * rows);
 
-            int tx = startX + (v % cols);        // columna
-            int ty = startY + (v / cols);        // fila
+            int tx = startX + (v % cols);
+            int ty = startY + (v / cols);
 
             return tileset.get(tx, ty);
         }
