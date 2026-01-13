@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <memory>
 #include "Chunk.h"
-
+#include "core/Config.h"
 struct ChunkCoord {
     int x,y;
     bool operator==(const ChunkCoord& other) const {

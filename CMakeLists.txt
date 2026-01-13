@@ -42,6 +42,9 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/core/Config.h
         src/worldobjects/SpawnRules.cpp
         src/worldobjects/SpawnRules.h
+        src/render/ObjectVisual.h
+        src/render/ObjectAtlas.cpp
+        src/render/ObjectAtlas.h
 )
 
 target_link_libraries(ProjectSFML

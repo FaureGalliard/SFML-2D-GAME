@@ -13,10 +13,11 @@ public:
     WorldRenderer(const Tileset& tileset);
     void draw(sf::RenderWindow& window, const World& world);
     sf::IntRect pickTileRect(const Tile& tile) const;
-    void drawWorldObjects(sf::RenderWindow& window, const Chunk& chunk);
+    sf::IntRect pickObjectRect(const WorldObject& obj) const;
+    void drawChunkDebugBounds(sf::RenderWindow& window, const Chunk& chunk) const;
 private:
     const Tileset& tileset;
-    sf::IntRect pickObjectRect(const WorldObject& obj) const;
+
     sf::IntRect pickBasic(const Tile& tile) const;
 };
 

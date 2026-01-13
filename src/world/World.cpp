@@ -4,7 +4,6 @@
 
 #include "World.h"
 #include <unordered_set>
-
 static int floorDiv(int a, int b) {
     int r = a / b;
     if ((a ^ b) < 0 && a % b) --r;
@@ -16,8 +15,8 @@ World::World(){}
 
 void World::update(int playerTileX,int playerTileY) {
 
-    int centerCx = floorDiv(playerTileX, Chunk::SIZE);
-    int centerCy = floorDiv(playerTileY, Chunk::SIZE);
+    int centerCx = floorDiv(playerTileX, CHUNK_SIZE);
+    int centerCy = floorDiv(playerTileY, CHUNK_SIZE);
 
     std::unordered_set<ChunkCoord, ChunkCoordHash> needed;
 
@@ -49,28 +48,33 @@ void World::loadChunk(int cx, int cy) {
     auto chunk = std::make_unique<Chunk>(cx, cy, *this);
     chunks[{cx, cy}] = std::move(chunk);
 
-    for (int dy = -1; dy <= 1; ++dy)
+    for (int dy = -1; dy <= 1; ++dy) {
         for (int dx = -1; dx <= 1; ++dx) {
             auto it = chunks.find({cx + dx, cy + dy});
-            if (it != chunks.end())
+            if (it != chunks.end()) {
                 it->second->finalizeAutoTiling();
+                it->second->invalidateObjectMesh();
+            }
         }
+    }
 }
 
 const std::unordered_map<
     ChunkCoord,
     std::unique_ptr<Chunk>,
     ChunkCoordHash>&
+
+
 World::getChunks() const {
     return chunks;
 }
 
 const Tile* World::getTileGlobal(int wx, int wy) const {
-    int cx = floorDiv(wx, Chunk::SIZE);
-    int cy = floorDiv(wy, Chunk::SIZE);
+    int cx = floorDiv(wx, CHUNK_SIZE);
+    int cy = floorDiv(wy, CHUNK_SIZE);
 
-    int tx = wx - cx * Chunk::SIZE;
-    int ty = wy - cy * Chunk::SIZE;
+    int tx = wx - cx * CHUNK_SIZE;
+    int ty = wy - cy * CHUNK_SIZE;
 
 
 
@@ -78,5 +82,5 @@ const Tile* World::getTileGlobal(int wx, int wy) const {
     if (it == chunks.end())
         return nullptr;
 
-    return &it->second->getTile(tx, ty);
+    return &it->second->tiles[ty][tx];
 }

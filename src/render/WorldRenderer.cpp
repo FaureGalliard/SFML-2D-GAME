@@ -7,7 +7,7 @@
 #include "world/Chunk.h"
 #include "world/Tile.h"
 #include "world/World.h"
-
+#include "render/ObjectAtlas.h"
 WorldRenderer::WorldRenderer(const Tileset& tileset) : tileset(tileset){
 
 
@@ -43,60 +43,30 @@ sf::IntRect WorldRenderer::pickBasic(const Tile& tile) const {
             return tileset.get(0, 0);
     }
 }
-
 sf::IntRect WorldRenderer::pickObjectRect(const WorldObject& obj) const {
-    switch (obj.type) {
-        case WorldObjectType::Flower: {
-            int cols = 4;
-            int rows = 3;
-            int startX = 31;
-            int startY = 1;
 
-            int v = obj.variant % (cols * rows);
-
-            int tx = startX + (v % cols);
-            int ty = startY + (v / cols);
-
-            return tileset.get(tx, ty);
-        }
-
-        case WorldObjectType::Rock:
-            return tileset.get(31 , 4);
-        case WorldObjectType::GrassTuft:
-            return tileset.get(27 , 1);
-        case WorldObjectType::Bush:
-            return tileset.get(51 , 4);
-        case WorldObjectType::Tree1x3:
-            return tileset.get(52 , 3,1,3);
-        case WorldObjectType::Tree2x3:
-            return tileset.get(51 , 6,2,3);
-        default:
-            return tileset.get(0, 0);
-    }
+    const ObjectVisual& v = getObjectVisual(obj.type);
+    return tileset.get(v.startX, v.startY, v.width, v.height);
 }
 
+void WorldRenderer::drawChunkDebugBounds(    sf::RenderWindow& window,    const Chunk& chunk) const {
+    sf::RectangleShape rect;
 
-void WorldRenderer::drawWorldObjects(sf::RenderWindow& window,
-                                     const Chunk& chunk) {
+    rect.setSize({
+        float(CHUNK_SIZE * TILE_SIZE),
+        float(CHUNK_SIZE * TILE_SIZE)
+    });
 
-    sf::Sprite sprite;
-    sprite.setTexture(tileset.texture());
+    rect.setPosition(
+        chunk.cx * CHUNK_SIZE * TILE_SIZE,
+        chunk.cy * CHUNK_SIZE * TILE_SIZE
+    );
 
-    for (const WorldObject& obj : chunk.getWorldObjects()) {
+    rect.setFillColor(sf::Color::Transparent);
+    rect.setOutlineThickness(2.f);
+    rect.setOutlineColor(sf::Color::Red);
 
-        sf::IntRect tex = pickObjectRect(obj);
-        sprite.setTextureRect(tex);
-
-        float wx = (chunk.getCX() * Chunk::SIZE + obj.tileX) * TILE_SIZE;
-        float wy = (chunk.getCY() * Chunk::SIZE + obj.tileY) * TILE_SIZE;
-
-        float ox = (TILE_SIZE - tex.width) * 0.5f;
-        float oy = (TILE_SIZE - tex.height);
-
-        sprite.setPosition(wx + ox, wy + oy);
-
-        window.draw(sprite);
-    }
+    window.draw(rect);
 }
 
 void WorldRenderer::draw(sf::RenderWindow& window, const World& world) {
@@ -109,9 +79,13 @@ void WorldRenderer::draw(sf::RenderWindow& window, const World& world) {
         if (!chunk.isMeshBuilt())
             chunk.buildMesh(*this);
 
-        window.draw(chunk.getMesh(), states);
-        drawWorldObjects(window, chunk);
+        if (!chunk.isObjectMeshBuilt())
+            chunk.buildObjectMesh(*this);
+
+        window.draw(chunk.mesh, states);
+        window.draw(chunk.objectMesh, states);
+        drawChunkDebugBounds(window, chunk);
     }
 
-
 }
+

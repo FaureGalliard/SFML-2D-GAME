@@ -3,7 +3,6 @@
 #include <vector>
 #include "world/Tile.h"
 #include "WorldObject.h"
-
 struct SpawnRule {
     WorldObjectType type;
     std::vector<TileType> allowed;
