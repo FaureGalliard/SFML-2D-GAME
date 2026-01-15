@@ -5,7 +5,8 @@ Game::Game()
     : window(sf::VideoMode(1280, 720), "Save the Valley"),
       world(WORLD_SEED),
       renderer(tileset),
-      hero(0.0f, 0.0f)
+      hero(0.0f, 0.0f),
+      inputSystem()
 {
     window.setFramerateLimit(60);
 
@@ -51,6 +52,18 @@ void Game::processEvents() {
 }
 
 void Game::update(float dt) {
+    inputSystem.update();
+
+    sf::Vector2f moveDir = inputSystem.getMoveDirection();
+    bool running = inputSystem.isRunning();
+
+    hero.moveInDirection(moveDir, running);
+
+    EntityState pressedAction = inputSystem.getPressedAction();
+    if (pressedAction != EntityState::Idle) {
+        hero.triggerAction(pressedAction);
+    }
+
     hero.update(dt);
 
     world.update(hero.getTileX(), hero.getTileY());

@@ -34,14 +34,12 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/systems/InputSystem.h
         src/render/EntityRenderer.cpp
         src/render/EntityRenderer.h
-        src/render/Animation.h
         src/entities/Hero.cpp
         src/entities/Hero.h
 
         src/core/Config.h
         src/objects/SpawnRules.cpp
         src/objects/SpawnRules.h
-        src/entities/Entity.h
         src/systems/MovementSystem.cpp
         src/systems/MovementSystem.h
         src/systems/CombatSystem.cpp
@@ -59,6 +57,10 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/objects/ObjectVisual.h
         src/render/Camera.cpp
         src/render/Camera.h
+        src/render/Animation.cpp
+        src/render/Animation.h
+        src/entities/Entity.cpp
+        src/entities/Entity.h
 )
 
 target_link_libraries(ProjectSFML

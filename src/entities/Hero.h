@@ -1,28 +1,45 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <map>
+#include <memory>
+#include "Entity.h"
 #include "core/Config.h"
+#include "render/Animation.h"
 
-class Hero {
+
+class Hero : public Entity {
 public:
     Hero();
     Hero(float x, float y);
 
-    void update(float dt);
+    void update(float dt) override;
 
-    sf::Vector2f getPosition() const { return position; }
-    void setPosition(const sf::Vector2f& pos) { position = pos; }
+    void moveInDirection(const sf::Vector2f& direction, bool running = false);
+    void triggerAction(EntityState action);
 
     int getTileX() const { return static_cast<int>(position.x / TILE_SIZE); }
     int getTileY() const { return static_cast<int>(position.y / TILE_SIZE); }
     sf::Vector2i getTilePosition() const { return {getTileX(), getTileY()}; }
 
-    const sf::Sprite& getSprite() const { return sprite; }
+    Animation* getCurrentAnimation();
+    const Animation* getCurrentAnimation() const;
 
 private:
-    sf::Vector2f position;
-    sf::Vector2f velocity;
-    sf::Sprite sprite;
+    std::map<EntityState, std::unique_ptr<Animation>> animations;
+    float speed;
+    float runSpeedMultiplier;
+    float idleTimer;
+    float idleTimeThreshold;
 
-    float speed = 100.0f;
+    void initAnimations();
+    void addAnimation(EntityState state,
+                     const std::string& folder,
+                     const std::string& file,
+                     sf::Vector2i frames,
+                     float frameSpeed = 0.1f,
+                     bool looping = true);
+    void updateAnimations(float dt);
+    void handleStateTransitions();
+    void updateIdleTimer(float dt);
 };

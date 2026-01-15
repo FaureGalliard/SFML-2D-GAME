@@ -1,8 +1,58 @@
-//
-// Created by angel on 14/01/2026.
-//
+#pragma once
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Rect.hpp>
 
-#ifndef PROJECTSFML_ENTITY_H
-#define PROJECTSFML_ENTITY_H
+enum class EntityState {
+    Idle,
+    Walking,
+    Running,
+    Attack,
+    Hurt,
+    Death,
 
-#endif //PROJECTSFML_ENTITY_H
+    Axe,
+    Hammering,
+    Roll,
+    Watering,
+    Dig,
+    Mining
+};
+
+class Entity {
+public:
+    Entity();
+    Entity(float x, float y);
+    virtual ~Entity() = default;
+
+    virtual void update(float dt) = 0;
+
+    sf::Vector2f getPosition() const { return position; }
+    void setPosition(const sf::Vector2f& pos) { position = pos; }
+    void setPosition(float x, float y) { position = {x, y}; }
+
+    sf::Vector2f getVelocity() const { return velocity; }
+    void setVelocity(const sf::Vector2f& vel) { velocity = vel; }
+    void setVelocity(float x, float y) { velocity = {x, y}; }
+
+    EntityState getState() const { return state; }
+    void setState(EntityState newState);
+
+    sf::FloatRect getBounds() const;
+    void setBoundingBox(const sf::FloatRect& box) { boundingBox = box; }
+
+    int getHealth() const { return health; }
+    void setHealth(int h) { health = h; }
+    bool isAlive() const { return health > 0; }
+
+    bool isFacingLeft() const { return facingLeft; }
+    void setFacingLeft(bool left) { facingLeft = left; }
+
+protected:
+    sf::Vector2f position;
+    sf::Vector2f velocity;
+    EntityState state;
+    sf::FloatRect boundingBox;
+    int health;
+    int maxHealth;
+    bool facingLeft;
+};

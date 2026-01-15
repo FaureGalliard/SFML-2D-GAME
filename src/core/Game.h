@@ -5,6 +5,7 @@
 #include "render/Camera.h"
 #include "render/Tileset.h"
 #include "entities/Hero.h"
+#include "systems/InputSystem.h"
 
 class Game {
 public:
@@ -23,6 +24,9 @@ private:
     Tileset tileset;
 
     World world;
+
+    InputSystem inputSystem;
+
     Camera camera;
     Renderer renderer;
 
