@@ -23,28 +23,42 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/world/Chunk.cpp
         src/world/Chunk.h
         src/world/Tile.h
-        src/world/Noise.h
-        src/worldobjects/WorldObject.h
+        src/world/generation/Noise.h
+        src/objects/WorldObject.h
         src/render/Tileset.cpp
         src/render/Tileset.h
         src/render/WorldRenderer.cpp
         src/render/WorldRenderer.h
-        src/world/Noise.cpp
+        src/world/generation/Noise.cpp
         src/systems/InputSystem.cpp
         src/systems/InputSystem.h
         src/render/EntityRenderer.cpp
         src/render/EntityRenderer.h
         src/render/Animation.h
-        src/render/Camera.h
         src/entities/Hero.cpp
         src/entities/Hero.h
 
         src/core/Config.h
-        src/worldobjects/SpawnRules.cpp
-        src/worldobjects/SpawnRules.h
-        src/render/ObjectVisual.h
-        src/render/ObjectAtlas.cpp
-        src/render/ObjectAtlas.h
+        src/objects/SpawnRules.cpp
+        src/objects/SpawnRules.h
+        src/entities/Entity.h
+        src/systems/MovementSystem.cpp
+        src/systems/MovementSystem.h
+        src/systems/CombatSystem.cpp
+        src/systems/CombatSystem.h
+        src/systems/AISystem.cpp
+        src/systems/AISystem.h
+        src/render/Renderer.cpp
+        src/render/Renderer.h
+        src/world/generation/TerrainGenerator.cpp
+        src/world/generation/TerrainGenerator.h
+        src/world/generation/ObjectSpawner.cpp
+        src/world/generation/ObjectSpawner.h
+        src/objects/ObjectAtlas.cpp
+        src/objects/ObjectAtlas.h
+        src/objects/ObjectVisual.h
+        src/render/Camera.cpp
+        src/render/Camera.h
 )
 
 target_link_libraries(ProjectSFML

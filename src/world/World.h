@@ -1,10 +1,15 @@
 #pragma once
 #include <unordered_map>
 #include <memory>
+#include <vector>
 #include "Chunk.h"
 #include "core/Config.h"
+
+class TerrainGenerator;
+class ObjectSpawner;
+
 struct ChunkCoord {
-    int x,y;
+    int x, y;
     bool operator==(const ChunkCoord& other) const {
         return x == other.x && y == other.y;
     }
@@ -20,14 +25,31 @@ struct ChunkCoordHash {
 
 class World {
 public:
-    World();
-    void update(int playerTileX,int playerTileY);
-    const std::unordered_map<ChunkCoord,
-    std::unique_ptr<Chunk>,ChunkCoordHash>&
+    explicit World(uint32_t seed);
+    ~World();
+
+
+    void update(int playerTileX, int playerTileY);
+
+    const std::unordered_map<ChunkCoord, std::unique_ptr<Chunk>, ChunkCoordHash>&
     getChunks() const;
+
+
+    std::vector<Chunk*> getVisibleChunks(const sf::FloatRect& cameraBounds) const;
+
     const Tile* getTileGlobal(int wx, int wy) const;
+
+    Chunk* getChunk(int cx, int cy);
+    const Chunk* getChunk(int cx, int cy) const;
+
 private:
     static constexpr int LOAD_RADIUS = 2;
-    std::unordered_map<ChunkCoord,std::unique_ptr<Chunk>,ChunkCoordHash> chunks;
-    void loadChunk(int cx,int cy);
+
+    std::unordered_map<ChunkCoord, std::unique_ptr<Chunk>, ChunkCoordHash> chunks;
+    std::unique_ptr<TerrainGenerator> terrainGen;
+    std::unique_ptr<ObjectSpawner> objSpawner;
+
+    void loadChunk(int cx, int cy);
+
+    void unloadFarChunks(int centerCx, int centerCy);
 };

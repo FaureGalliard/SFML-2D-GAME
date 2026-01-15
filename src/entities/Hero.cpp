@@ -1,31 +1,39 @@
-//
-// Created by angel on 9/01/2026.
-//
-
 #include "Hero.h"
 #include <SFML/Window/Keyboard.hpp>
+#include <cmath>
+Hero::Hero() : position(0.0f, 0.0f), velocity(0.0f, 0.0f) {
+}
 
-constexpr int TILE_SIZE = 16;
-
-Hero::Hero() {
-    position = {0.f, 0.f};
+Hero::Hero(float x, float y) : position(x, y), velocity(0.0f, 0.0f) {
 }
 
 void Hero::update(float dt) {
-    sf::Vector2f dir{0.f, 0.f};
+    velocity = {0.0f, 0.0f};
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) dir.y -= 1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) dir.y += 1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) dir.x -= 1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) dir.x += 1;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+        velocity.y = -speed;
+        }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+        velocity.y = speed;
+        }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) ||
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+        velocity.x = -speed;
+        }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+        velocity.x = speed;
+        }
 
-    position += dir * speed * dt;
-}
+    float length = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+    if (length > 0) {
+        velocity.x = (velocity.x / length) * speed;
+        velocity.y = (velocity.y / length) * speed;
+    }
 
-int Hero::getTileX() const {
-    return static_cast<int>(position.x) / TILE_SIZE;
-}
+    position += velocity * dt;
 
-int Hero::getTileY() const {
-    return static_cast<int>(position.y) / TILE_SIZE;
+    sprite.setPosition(position);
 }

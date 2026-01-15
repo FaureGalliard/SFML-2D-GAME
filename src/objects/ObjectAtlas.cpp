@@ -1,5 +1,6 @@
 #include "ObjectAtlas.h"
 #include <cassert>
+#include <unordered_map>
 static const std::unordered_map<WorldObjectType, ObjectVisual> visuals = {
 
     { WorldObjectType::Flower,    {31, 1,  1, 1} },

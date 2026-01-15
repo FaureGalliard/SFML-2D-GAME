@@ -1,8 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <unordered_map>
-#include <SFML/Graphics/Rect.hpp>
-#include "worldobjects/WorldObject.h"
 
 struct ObjectVisual {
     uint8_t startX;
