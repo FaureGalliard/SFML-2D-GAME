@@ -16,7 +16,7 @@ void Renderer::render(sf::RenderWindow& window,
                      const std::vector<Chunk*>& visibleChunks,
                      const Hero& hero) {
 
-    window.clear(sf::Color(50, 120, 180)); // Color de fondo azul cielo
+    window.clear();
 
     sf::View view = camera.getView();
     window.setView(view);
@@ -24,7 +24,6 @@ void Renderer::render(sf::RenderWindow& window,
     worldRenderer->draw(window, visibleChunks);
 
     entityRenderer->drawHero(window, hero);
-
 
     window.display();
 }

@@ -12,14 +12,13 @@ Animation::Animation(const std::vector<std::string>& texturePaths,
     , loop(looping)
 {
     textures.resize(texturePaths.size());
-    
+
     for (size_t i = 0; i < texturePaths.size(); ++i) {
         if (!textures[i].loadFromFile(texturePaths[i])) {
             throw std::runtime_error("Failed to load texture: " + texturePaths[i]);
         }
     }
 
-    // Calcular tamaño de frame basado en la primera textura
     if (!textures.empty()) {
         frameSize = {
             static_cast<int>(textures[0].getSize().x) / frameCount.x,
@@ -37,7 +36,6 @@ void Animation::update(float dt) {
     
     timer = 0.0f;
     
-    // Avanzar al siguiente frame
     currentFrame.x++;
     
     if (currentFrame.x >= frameCount.x) {

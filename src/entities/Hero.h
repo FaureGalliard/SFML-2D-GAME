@@ -41,5 +41,4 @@ private:
                      bool looping = true);
     void updateAnimations(float dt);
     void handleStateTransitions();
-    void updateIdleTimer(float dt);
 };

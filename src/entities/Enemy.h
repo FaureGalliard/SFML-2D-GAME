@@ -1,13 +1,42 @@
-//
-// Created by angel on 9/01/2026.
-//
+#pragma once
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <map>
+#include <memory>
+#include "Entity.h"
+#include "core/Config.h"
+#include "render/Animation.h"
 
-#ifndef PROJECTSFML_ENEMY_H
-#define PROJECTSFML_ENEMY_H
 
+class Enemy : public Entity {
+public:
+    Enemy();
+    Enemy(float x, float y);
 
-class Enemy {
+    void update(float dt) override;
+
+    void moveInDirection(const sf::Vector2f& direction, bool running = false);
+    void triggerAction(EntityState action);
+
+    int getTileX() const { return static_cast<int>(position.x / TILE_SIZE); }
+    int getTileY() const { return static_cast<int>(position.y / TILE_SIZE); }
+    sf::Vector2i getTilePosition() const { return {getTileX(), getTileY()}; }
+
+    Animation* getCurrentAnimation();
+    const Animation* getCurrentAnimation() const;
+
+private:
+
+    std::map<EntityState, std::unique_ptr<Animation>> animations;
+    float speed;
+    float runSpeedMultiplier;
+
+    void initAnimations();
+    void addAnimation(EntityState state,
+                     const std::string& file,
+                     sf::Vector2i frames,
+                     float frameSpeed = 0.1f,
+                     bool looping = true);
+    void updateAnimations(float dt);
+    void handleStateTransitions();
 };
-
-
-#endif //PROJECTSFML_ENEMY_H

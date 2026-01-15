@@ -17,7 +17,12 @@ void EntityRenderer::drawHero(sf::RenderWindow& window, const Hero& hero) {
 }
 
 void EntityRenderer::drawEnemy(sf::RenderWindow& window, const Enemy& enemy) {
+    const Animation* animation = enemy.getCurrentAnimation();
+    if (!animation) {
+        return;
+    }
 
+    drawAnimation(window, animation, enemy.getPosition(), enemy.isFacingLeft());
 }
 
 void EntityRenderer::drawAnimation(sf::RenderWindow& window,
