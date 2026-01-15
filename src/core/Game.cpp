@@ -16,8 +16,8 @@ Game::Game()
     }
 
     hero.setPosition(sf::Vector2f(
-        CHUNK_SIZE * TILE_SIZE * 2.0f,  // Centro horizontal
-        CHUNK_SIZE * TILE_SIZE * 2.0f   // Centro vertical
+        CHUNK_SIZE * TILE_SIZE * 2.0f,
+        CHUNK_SIZE * TILE_SIZE * 2.0f
     ));
 
     camera.setSize(sf::Vector2f(1280.0f, 720.0f));

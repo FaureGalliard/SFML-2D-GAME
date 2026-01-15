@@ -1,8 +1,33 @@
-//
-// Created by angel on 9/01/2026.
-//
+#pragma once
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <string>
 
-#ifndef PROJECTSFML_ANIMATION_H
-#define PROJECTSFML_ANIMATION_H
 
-#endif //PROJECTSFML_ANIMATION_H
+class Animation {
+public:
+    Animation(const std::vector<std::string>& texturePaths, 
+              sf::Vector2i frameCount, 
+              float frameTime = 0.1f, 
+              bool looping = true);
+
+    void update(float dt);
+    void reset();
+    
+    bool isFinished() const;
+    bool isLooping() const;
+    sf::IntRect getCurrentFrame() const;
+    sf::Vector2i getFrameSize() const;
+    const std::vector<sf::Texture>& getTextures() const { return textures; }
+
+private:
+    std::vector<sf::Texture> textures;
+    sf::Vector2i frameSize;
+    sf::Vector2i frameCount;
+    sf::Vector2i currentFrame;
+    float frameTime;
+    float timer;
+    bool loop;
+
+    void calculateCurrentFrame();
+};

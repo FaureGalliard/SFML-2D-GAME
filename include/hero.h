@@ -123,7 +123,6 @@ public:
             auto* action = actions[currentState].get();
             action->reset();
             action->setPosition(getPosition());
-            // Aplica la orientación guardada a la nueva acción
             if (facingLeft) {
                 action->faceLeft();
             } else {
