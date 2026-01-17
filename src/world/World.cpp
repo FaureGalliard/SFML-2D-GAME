@@ -3,6 +3,7 @@
 #include "generation/ObjectSpawner.h"
 #include <unordered_set>
 #include <cmath>
+#include <random>
 
 static int floorDiv(int a, int b) {
     int r = a / b;
@@ -36,6 +37,10 @@ void World::update(int playerTileX, int playerTileY) {
     }
 
     unloadFarChunks(centerCx, centerCy);
+
+    for (Enemy& enemy : enemies) {
+        enemy.update(1.0f / 60.0f); // TODO: usar delta time real
+    }
 }
 
 void World::loadChunk(int cx, int cy) {
@@ -56,6 +61,30 @@ void World::loadChunk(int cx, int cy) {
             }
         }
     }
+
+    spawnEnemiesInChunk(cx, cy);
+}
+
+void World::spawnEnemiesInChunk(int cx, int cy) {
+
+    std::mt19937 rng(WORLD_SEED^ (cx * 73856093 ^ cy * 19349663));
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
+    if (dist(rng) < 0.3f) {
+        std::uniform_int_distribution<int> countDist(1, 3);
+        int enemyCount = countDist(rng);
+
+        for (int i = 0; i < enemyCount; ++i) {
+            std::uniform_int_distribution<int> tileDist(2, CHUNK_SIZE - 3);
+            int tileX = tileDist(rng);
+            int tileY = tileDist(rng);
+
+            float worldX = (cx * CHUNK_SIZE + tileX) * TILE_SIZE;
+            float worldY = (cy * CHUNK_SIZE + tileY) * TILE_SIZE;
+
+            enemies.emplace_back(worldX, worldY);
+        }
+    }
 }
 
 void World::unloadFarChunks(int centerCx, int centerCy) {
@@ -69,6 +98,19 @@ void World::unloadFarChunks(int centerCx, int centerCy) {
             ++it;
         }
     }
+
+    enemies.erase(
+        std::remove_if(enemies.begin(), enemies.end(),
+            [centerCx, centerCy](const Enemy& e) {
+                int enemyCx = floorDiv(e.getTileX(), CHUNK_SIZE);
+                int enemyCy = floorDiv(e.getTileY(), CHUNK_SIZE);
+                int dx = std::abs(enemyCx - centerCx);
+                int dy = std::abs(enemyCy - centerCy);
+                return dx > LOAD_RADIUS || dy > LOAD_RADIUS;
+            }
+        ),
+        enemies.end()
+    );
 }
 
 const std::unordered_map<ChunkCoord, std::unique_ptr<Chunk>, ChunkCoordHash>&
@@ -94,6 +136,18 @@ std::vector<Chunk*> World::getVisibleChunks(const sf::FloatRect& cameraBounds) c
     }
 
     return visible;
+}
+
+std::vector<const Enemy*> World::getVisibleEnemies(const sf::FloatRect& cameraBounds) const {
+    std::vector<const Enemy*> result;
+
+    for (const Enemy& enemy : enemies) {
+        if (cameraBounds.intersects(enemy.getBounds())) {
+            result.push_back(&enemy);
+        }
+    }
+
+    return result;
 }
 
 const Tile* World::getTileGlobal(int wx, int wy) const {

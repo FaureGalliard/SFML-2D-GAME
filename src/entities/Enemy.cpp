@@ -20,11 +20,11 @@ Enemy::Enemy(float x, float y)
 }
 
 void Enemy::initAnimations() {
-    addAnimation(EntityState::Idle,"idle_strip9.png",        {9, 1});
-    addAnimation(EntityState::Walking,"walk_strip8.png",        {8, 1});
-    addAnimation(EntityState::Attack,"attack_strip10.png",     {10, 1}, 0.1f, false);
-    addAnimation(EntityState::Hurt,"hurt_strip8.png",        {8, 1}, 0.1f, false);
-    addAnimation(EntityState::Death,"death_strip13.png",      {13, 1}, 0.1f, false);
+    addAnimation(EntityState::Idle,"skeleton_idle_strip6.png",        {6, 1});
+    addAnimation(EntityState::Walking,"skeleton_walk_strip8.png",        {8, 1});
+    addAnimation(EntityState::Attack,"skeleton_attack_strip7.png",     {7, 1}, 0.1f, false);
+    addAnimation(EntityState::Hurt,"skeleton_hurt_strip7.png",        {7, 1}, 0.1f, false);
+    addAnimation(EntityState::Death,"skeleton_death_strip10.png",      {10, 1}, 0.1f, false);
 }
 
 void Enemy::addAnimation(EntityState state,

@@ -21,7 +21,9 @@ public:
     void render(sf::RenderWindow& window,
                 const Camera& camera,
                 const std::vector<Chunk*>& visibleChunks,
-                const Hero& hero);
+                const Hero& hero,
+                const std::vector<const Enemy*>& visibleEnemies);
+
 
     WorldRenderer& getWorldRenderer();
     EntityRenderer& getEntityRenderer();

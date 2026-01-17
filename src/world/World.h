@@ -4,6 +4,7 @@
 #include <vector>
 #include "Chunk.h"
 #include "core/Config.h"
+#include "entities/Enemy.h"
 
 class TerrainGenerator;
 class ObjectSpawner;
@@ -28,14 +29,14 @@ public:
     explicit World(uint32_t seed);
     ~World();
 
-
     void update(int playerTileX, int playerTileY);
 
     const std::unordered_map<ChunkCoord, std::unique_ptr<Chunk>, ChunkCoordHash>&
     getChunks() const;
 
-
     std::vector<Chunk*> getVisibleChunks(const sf::FloatRect& cameraBounds) const;
+
+    std::vector<const Enemy*> getVisibleEnemies(const sf::FloatRect& cameraBounds) const;
 
     const Tile* getTileGlobal(int wx, int wy) const;
 
@@ -49,7 +50,9 @@ private:
     std::unique_ptr<TerrainGenerator> terrainGen;
     std::unique_ptr<ObjectSpawner> objSpawner;
 
-    void loadChunk(int cx, int cy);
+    std::vector<Enemy> enemies;
 
+    void loadChunk(int cx, int cy);
     void unloadFarChunks(int centerCx, int centerCy);
+    void spawnEnemiesInChunk(int cx, int cy);
 };

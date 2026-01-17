@@ -74,6 +74,7 @@ void Game::update(float dt) {
 void Game::render() {
     sf::FloatRect cameraBounds = camera.getBounds();
     std::vector<Chunk*> visibleChunks = world.getVisibleChunks(cameraBounds);
+    std::vector<const Enemy*> visibleEnemies = world.getVisibleEnemies(cameraBounds);
 
-    renderer.render(window, camera, visibleChunks, hero);
+    renderer.render(window, camera, visibleChunks, hero, visibleEnemies);
 }
