@@ -1,6 +1,7 @@
 #include "World.h"
 #include "generation/TerrainGenerator.h"
 #include "generation/ObjectSpawner.h"
+#include "generation/BiomeNoise.h"
 #include <unordered_set>
 #include <cmath>
 #include <random>
@@ -12,8 +13,10 @@ static int floorDiv(int a, int b) {
 }
 
 World::World(uint32_t seed)
-    : terrainGen(std::make_unique<TerrainGenerator>(seed)),
-      objSpawner(std::make_unique<ObjectSpawner>(seed + 1)) {
+    : biomeNoise(std::make_unique<BiomeNoise>(seed))
+    , terrainGen(std::make_unique<TerrainGenerator>(seed))
+    , objSpawner(std::make_unique<ObjectSpawner>(seed + 1, *biomeNoise))
+{
 }
 
 World::~World() = default;
@@ -39,7 +42,7 @@ void World::update(int playerTileX, int playerTileY) {
     unloadFarChunks(centerCx, centerCy);
 
     for (Enemy& enemy : enemies) {
-        enemy.update(1.0f / 60.0f); // TODO: usar delta time real
+        enemy.update(1.0f / 60.0f);
     }
 }
 
@@ -66,11 +69,10 @@ void World::loadChunk(int cx, int cy) {
 }
 
 void World::spawnEnemiesInChunk(int cx, int cy) {
-
-    std::mt19937 rng(WORLD_SEED^ (cx * 73856093 ^ cy * 19349663));
+    std::mt19937 rng(cx * 73856093 ^ cy * 19349663);
     std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 
-    if (dist(rng) < 0.3f) {
+    if (dist(rng) < 0.3f) { // 30% de probabilidad
         std::uniform_int_distribution<int> countDist(1, 3);
         int enemyCount = countDist(rng);
 

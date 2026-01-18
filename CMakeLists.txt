@@ -61,6 +61,8 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/render/Animation.h
         src/entities/Entity.cpp
         src/entities/Entity.h
+        src/world/generation/BiomeNoise.cpp
+        src/world/generation/BiomeNoise.h
 )
 
 target_link_libraries(ProjectSFML

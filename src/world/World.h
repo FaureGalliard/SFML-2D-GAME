@@ -8,6 +8,7 @@
 
 class TerrainGenerator;
 class ObjectSpawner;
+class BiomeNoise;
 
 struct ChunkCoord {
     int x, y;
@@ -47,6 +48,8 @@ private:
     static constexpr int LOAD_RADIUS = 2;
 
     std::unordered_map<ChunkCoord, std::unique_ptr<Chunk>, ChunkCoordHash> chunks;
+
+    std::unique_ptr<BiomeNoise> biomeNoise;
     std::unique_ptr<TerrainGenerator> terrainGen;
     std::unique_ptr<ObjectSpawner> objSpawner;
 
