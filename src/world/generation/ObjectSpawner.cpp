@@ -10,8 +10,10 @@ ObjectSpawner::ObjectSpawner(uint32_t seed, const BiomeNoise& biomeNoise)
 }
 
 void ObjectSpawner::spawnObjects(Chunk& chunk, int cx, int cy) {
+    // Primero spawnear árboles (bosques)
     spawnTrees(chunk, cx, cy);
 
+    // Luego decoraciones (piedras, flores, etc.)
     spawnDecorations(chunk, cx, cy);
 }
 
@@ -29,11 +31,13 @@ void ObjectSpawner::spawnTrees(Chunk& chunk, int cx, int cy) {
 
             float forest = biomeNoise.sampleForest(wx, wy);
 
-            if (forest < 0.40f) continue;
+
+            if (forest < 0.65f) continue;
 
             if (biomeNoise.isClearing(wx, wy)) continue;
 
-            float density = (forest - 0.40f) / 0.45f;
+
+            float density = (forest - 0.65f) / 0.35f;
 
             float detail = biomeNoise.sampleDetail(wx, wy);
             density += detail * 0.15f; // Pequeña variación
@@ -41,14 +45,15 @@ void ObjectSpawner::spawnTrees(Chunk& chunk, int cx, int cy) {
 
             float roll = dist(rng);
 
-            if (roll > density * 0.85f) continue;
+
+            if (roll > density * 0.75f) continue;
 
             int variant = 0;
             if (detail > 0.3f) variant = 1;
             else if (detail < -0.3f) variant = 2;
 
             chunk.worldObjects.emplace_back(
-                WorldObjectType::Tree2x3,
+                WorldObjectType::Tree1x3,
                 variant,
                 x,
                 y
@@ -70,14 +75,16 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
             int wy = cy * CHUNK_SIZE + y;
 
             float roll = dist(rng);
+            float forest = biomeNoise.sampleForest(wx, wy);
+            bool inClearing = biomeNoise.isClearing(wx, wy);
 
             if (ground == TileType::Grass) {
-                float forest = biomeNoise.sampleForest(wx, wy);
 
-                if (forest < 0.5f && roll < 0.02f) {
+                if (forest < 0.6f && roll < 0.005f) {
+                    int rockVariant = static_cast<int>(roll * 100) % 2;
                     chunk.worldObjects.emplace_back(
                         WorldObjectType::Rock,
-                        0,
+                        rockVariant,
                         x,
                         y
                     );
@@ -85,7 +92,31 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
                     continue;
                 }
 
-                if (forest > 0.55f && biomeNoise.isClearing(wx, wy) && roll < 0.15f) {
+                if (forest >= 0.65f && inClearing && roll < 0.02f) {
+                    int rockVariant = static_cast<int>(roll * 100) % 2;
+                    chunk.worldObjects.emplace_back(
+                        WorldObjectType::Rock,
+                        rockVariant,
+                        x,
+                        y
+                    );
+                    chunk.occupied[y][x] = true;
+                    continue;
+                }
+
+                if (forest >= 0.65f && inClearing && roll < 0.03f) {
+                    int bushVariant = static_cast<int>(roll * 100) % 2;
+                    chunk.worldObjects.emplace_back(
+                        WorldObjectType::Bush,
+                        bushVariant,
+                        x,
+                        y
+                    );
+                    chunk.occupied[y][x] = true;
+                    continue;
+                }
+
+                if (forest >= 0.65f && inClearing && roll < 0.08f) {
                     int flowerVariant = static_cast<int>(roll * 100) % 3;
                     chunk.worldObjects.emplace_back(
                         WorldObjectType::Flower,
@@ -96,9 +127,20 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
                     chunk.occupied[y][x] = true;
                     continue;
                 }
+
+                if (forest >= 0.6f && forest < 0.7f && roll < 0.02f) { // Era 0.1 → ahora 0.02 (5× menos)
+                    chunk.worldObjects.emplace_back(
+                        WorldObjectType::Bush,
+                        0,
+                        x,
+                        y
+                    );
+                    chunk.occupied[y][x] = true;
+                    continue;
+                }
             }
 
-            if (ground == TileType::Sand && roll < 0.08f) {
+            if (ground == TileType::Sand && roll < 0.02f) { // Era 0.08 → ahora 0.02 (4× menos)
                 chunk.worldObjects.emplace_back(
                     WorldObjectType::Bush,
                     0,

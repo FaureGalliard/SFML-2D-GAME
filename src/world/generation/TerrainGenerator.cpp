@@ -21,18 +21,15 @@ void TerrainGenerator::generateTerrain(Chunk& chunk, int cx, int cy) {
 }
 
 float TerrainGenerator::sampleNoise(int wx, int wy) const {
-    // Terrain base
-    float terrain = noise.simplex(wx / TerrainParams::TERRAIN_SCALE, 
+    float terrain = noise.simplex(wx / TerrainParams::TERRAIN_SCALE,
                                    wy / TerrainParams::TERRAIN_SCALE);
     terrain = (terrain + 1.0f) * 0.5f;
     
-    // Detail layer
-    float detail = noise.simplex(wx / TerrainParams::DETAIL_SCALE, 
+    float detail = noise.simplex(wx / TerrainParams::DETAIL_SCALE,
                                   wy / TerrainParams::DETAIL_SCALE);
     detail = (detail + 1.0f) * 0.5f;
     
-    // Combine
-    return terrain * TerrainParams::TERRAIN_WEIGHT + 
+    return terrain * TerrainParams::TERRAIN_WEIGHT +
            detail * TerrainParams::DETAIL_WEIGHT;
 }
 
