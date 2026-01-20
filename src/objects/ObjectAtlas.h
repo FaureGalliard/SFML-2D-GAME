@@ -1,5 +1,6 @@
 #pragma once
 #include "ObjectVisual.h"
-#include "WorldObject.h"
+
+enum class WorldObjectType : uint8_t;
 
 const ObjectVisual& getObjectVisual(WorldObjectType type);

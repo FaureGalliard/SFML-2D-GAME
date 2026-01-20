@@ -42,7 +42,7 @@ void World::update(int playerTileX, int playerTileY) {
     unloadFarChunks(centerCx, centerCy);
 
     for (Enemy& enemy : enemies) {
-        enemy.update(1.0f / 60.0f);
+        enemy.update(1.0f / 60.0f); // TODO: usar delta time real
     }
 }
 
@@ -72,7 +72,7 @@ void World::spawnEnemiesInChunk(int cx, int cy) {
     std::mt19937 rng(cx * 73856093 ^ cy * 19349663);
     std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 
-    if (dist(rng) < 0.3f) { // 30% de probabilidad
+    if (dist(rng) < 0.3f) {
         std::uniform_int_distribution<int> countDist(1, 3);
         int enemyCount = countDist(rng);
 

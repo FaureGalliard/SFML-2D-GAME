@@ -29,8 +29,17 @@ sf::IntRect WorldRenderer::pickBasic(const Tile& tile) const {
 }
 
 sf::IntRect WorldRenderer::pickObjectRect(const WorldObject& obj) const {
-    const ObjectVisual& v = getObjectVisual(obj.type);
-    return tileset.get(v.startX, v.startY, v.width, v.height);
+    // 🟢 Obtener información visual del tipo
+    const ObjectVisual& visual = getObjectVisual(obj.type);
+
+    // 🟢 Clamp variant al rango válido (por seguridad)
+    uint8_t variantIndex = obj.variant % visual.variants.size();
+
+    // 🟢 Obtener la variante específica
+    const ObjectVariant& sprite = visual.variants[variantIndex];
+
+    // 🟢 Retornar el rect usando la posición y dimensiones
+    return tileset.get(sprite.x, sprite.y, visual.width, visual.height);
 }
 
 void WorldRenderer::drawChunkDebugBounds(sf::RenderWindow& window,
@@ -63,9 +72,7 @@ void WorldRenderer::draw(sf::RenderWindow& window,
             chunkPtr->buildObjectMesh(*this);
         }
 
-
         window.draw(chunkPtr->mesh, states);
         window.draw(chunkPtr->objectMesh, states);
-
     }
 }

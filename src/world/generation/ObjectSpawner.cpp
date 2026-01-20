@@ -1,7 +1,7 @@
 #include "ObjectSpawner.h"
 #include "BiomeNoise.h"
 #include "world/Chunk.h"
-#include "objects/SpawnRules.h"
+#include "objects/ObjectAtlas.h"
 
 ObjectSpawner::ObjectSpawner(uint32_t seed, const BiomeNoise& biomeNoise)
     : biomeNoise(biomeNoise)
@@ -10,10 +10,8 @@ ObjectSpawner::ObjectSpawner(uint32_t seed, const BiomeNoise& biomeNoise)
 }
 
 void ObjectSpawner::spawnObjects(Chunk& chunk, int cx, int cy) {
-    // Primero spawnear árboles (bosques)
     spawnTrees(chunk, cx, cy);
 
-    // Luego decoraciones (piedras, flores, etc.)
     spawnDecorations(chunk, cx, cy);
 }
 
@@ -31,29 +29,32 @@ void ObjectSpawner::spawnTrees(Chunk& chunk, int cx, int cy) {
 
             float forest = biomeNoise.sampleForest(wx, wy);
 
-
             if (forest < 0.65f) continue;
 
             if (biomeNoise.isClearing(wx, wy)) continue;
 
-
             float density = (forest - 0.65f) / 0.35f;
 
             float detail = biomeNoise.sampleDetail(wx, wy);
-            density += detail * 0.15f; // Pequeña variación
+            density += detail * 0.15f;
             density = std::clamp(density, 0.0f, 1.0f);
 
             float roll = dist(rng);
 
-
             if (roll > density * 0.75f) continue;
 
-            int variant = 0;
-            if (detail > 0.3f) variant = 1;
-            else if (detail < -0.3f) variant = 2;
+            WorldObjectType treeType = (roll < 0.7f) ? WorldObjectType::Tree2x3 : WorldObjectType::Tree1x3;
+
+            const ObjectVisual& visual = getObjectVisual(treeType);
+
+            uint8_t variant = 0;
+            if (visual.variants.size() > 1) {
+                float detailNormalized = (detail + 1.0f) * 0.5f; // [-1,1] → [0,1]
+                variant = static_cast<uint8_t>(detailNormalized * visual.variants.size()) % visual.variants.size();
+            }
 
             chunk.worldObjects.emplace_back(
-                WorldObjectType::Tree1x3,
+                treeType,
                 variant,
                 x,
                 y
@@ -77,26 +78,33 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
             float roll = dist(rng);
             float forest = biomeNoise.sampleForest(wx, wy);
             bool inClearing = biomeNoise.isClearing(wx, wy);
+            float detail = biomeNoise.sampleDetail(wx, wy);
 
             if (ground == TileType::Grass) {
 
                 if (forest < 0.6f && roll < 0.005f) {
-                    int rockVariant = static_cast<int>(roll * 100) % 2;
+                    const ObjectVisual& visual = getObjectVisual(WorldObjectType::Rock);
+                    uint8_t variant = static_cast<uint8_t>(std::abs(detail) * visual.variants.size()) % visual.variants.size();
+
                     chunk.worldObjects.emplace_back(
                         WorldObjectType::Rock,
-                        rockVariant,
+                        variant,
                         x,
                         y
                     );
                     chunk.occupied[y][x] = true;
+
+
                     continue;
                 }
 
                 if (forest >= 0.65f && inClearing && roll < 0.02f) {
-                    int rockVariant = static_cast<int>(roll * 100) % 2;
+                    const ObjectVisual& visual = getObjectVisual(WorldObjectType::Rock);
+                    uint8_t variant = static_cast<uint8_t>(std::abs(detail) * visual.variants.size()) % visual.variants.size();
+
                     chunk.worldObjects.emplace_back(
                         WorldObjectType::Rock,
-                        rockVariant,
+                        variant,
                         x,
                         y
                     );
@@ -105,10 +113,12 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
                 }
 
                 if (forest >= 0.65f && inClearing && roll < 0.03f) {
-                    int bushVariant = static_cast<int>(roll * 100) % 2;
+                    const ObjectVisual& visual = getObjectVisual(WorldObjectType::Bush);
+                    uint8_t variant = static_cast<uint8_t>(std::abs(detail) * visual.variants.size()) % visual.variants.size();
+
                     chunk.worldObjects.emplace_back(
                         WorldObjectType::Bush,
-                        bushVariant,
+                        variant,
                         x,
                         y
                     );
@@ -117,10 +127,14 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
                 }
 
                 if (forest >= 0.65f && inClearing && roll < 0.08f) {
-                    int flowerVariant = static_cast<int>(roll * 100) % 3;
+                    const ObjectVisual& visual = getObjectVisual(WorldObjectType::Flower);
+
+                    float detailNormalized = (detail + 1.0f) * 0.5f; // [-1,1] → [0,1]
+                    uint8_t variant = static_cast<uint8_t>(detailNormalized * visual.variants.size()) % visual.variants.size();
+
                     chunk.worldObjects.emplace_back(
                         WorldObjectType::Flower,
-                        flowerVariant,
+                        variant,
                         x,
                         y
                     );
@@ -128,7 +142,7 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
                     continue;
                 }
 
-                if (forest >= 0.6f && forest < 0.7f && roll < 0.02f) { // Era 0.1 → ahora 0.02 (5× menos)
+                if (forest >= 0.6f && forest < 0.7f && roll < 0.02f) {
                     chunk.worldObjects.emplace_back(
                         WorldObjectType::Bush,
                         0,
@@ -140,9 +154,9 @@ void ObjectSpawner::spawnDecorations(Chunk& chunk, int cx, int cy) {
                 }
             }
 
-            if (ground == TileType::Sand && roll < 0.02f) { // Era 0.08 → ahora 0.02 (4× menos)
+            if (ground == TileType::Sand && roll < 0.02f) {
                 chunk.worldObjects.emplace_back(
-                    WorldObjectType::Bush,
+                    WorldObjectType::Rock,
                     0,
                     x,
                     y
