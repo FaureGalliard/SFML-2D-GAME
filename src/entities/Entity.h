@@ -2,20 +2,11 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-enum class EntityState {
-    Idle,
-    Walking,
-    Running,
-    Attack,
-    Hurt,
-    Death,
+class World;
 
-    Axe,
-    Hammering,
-    Roll,
-    Watering,
-    Dig,
-    Mining
+enum class EntityState {
+    Idle, Walking, Running, Attack, Hurt, Death,
+    Axe, Hammering, Roll, Watering, Dig, Mining
 };
 
 class Entity {
@@ -47,6 +38,8 @@ public:
     bool isFacingLeft() const { return facingLeft; }
     void setFacingLeft(bool left) { facingLeft = left; }
 
+    void applyCollisions(const World& world, float dt);
+
 protected:
     sf::Vector2f position;
     sf::Vector2f velocity;
@@ -55,4 +48,6 @@ protected:
     int health;
     int maxHealth;
     bool facingLeft;
+
+    sf::Vector2f tryMove(const World& world, const sf::Vector2f& newPosition);
 };

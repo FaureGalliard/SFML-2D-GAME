@@ -7,13 +7,13 @@
 #include "core/Config.h"
 #include "render/Animation.h"
 
-
 class Hero : public Entity {
 public:
     Hero();
     Hero(float x, float y);
 
     void update(float dt) override;
+    void setWorld(const World* w) { world = w; }  // NUEVO
 
     void moveInDirection(const sf::Vector2f& direction, bool running = false);
     void triggerAction(EntityState action);
@@ -26,19 +26,15 @@ public:
     const Animation* getCurrentAnimation() const;
 
 private:
+    const World* world = nullptr;  // NUEVO
     std::map<EntityState, std::unique_ptr<Animation>> animations;
     float speed;
     float runSpeedMultiplier;
-    float idleTimer;
-    float idleTimeThreshold;
 
     void initAnimations();
-    void addAnimation(EntityState state,
-                     const std::string& folder,
-                     const std::string& file,
-                     sf::Vector2i frames,
-                     float frameSpeed = 0.1f,
-                     bool looping = true);
+    void addAnimation(EntityState state, const std::string& folder,
+                     const std::string& file, sf::Vector2i frames,
+                     float frameSpeed = 0.1f, bool looping = true);
     void updateAnimations(float dt);
     void handleStateTransitions();
 };

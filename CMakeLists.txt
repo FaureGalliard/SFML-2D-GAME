@@ -63,6 +63,9 @@ add_executable(ProjectSFML ${SOURCES} ${HEADERS}
         src/entities/Entity.h
         src/world/generation/BiomeNoise.cpp
         src/world/generation/BiomeNoise.h
+        src/objects/WorldObject.cpp
+        src/systems/CollisionSystem.cpp
+        src/systems/CollisionSystem.h
 )
 
 target_link_libraries(ProjectSFML

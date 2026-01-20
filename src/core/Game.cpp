@@ -21,8 +21,12 @@ Game::Game()
         CHUNK_SIZE * TILE_SIZE * 2.0f
     ));
 
+    hero.setWorld(&world);
+
     camera.setSize(sf::Vector2f(1280.0f, 720.0f));
     camera.setPosition(hero.getPosition());
+
+    renderer.setDebugMode(true);
 }
 
 void Game::run() {
@@ -46,6 +50,12 @@ void Game::processEvents() {
             if (event.key.code == sf::Keyboard::Escape) {
                 window.close();
                 running = false;
+            }
+
+            // NUEVO: Toggle debug con la tecla F3
+            if (event.key.code == sf::Keyboard::F3) {
+                bool currentDebug = renderer.isDebugMode();
+                renderer.setDebugMode(!currentDebug);
             }
         }
     }

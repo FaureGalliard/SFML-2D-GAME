@@ -52,11 +52,12 @@ void Hero::addAnimation(EntityState state,
 
 void Hero::update(float dt) {
     handleStateTransitions();
-
     updateAnimations(dt);
 
-    position += velocity * dt;
 
+    applyCollisions(*world, dt);
+
+    // Actualizar dirección
     if (velocity.x < 0) {
         facingLeft = true;
     } else if (velocity.x > 0) {

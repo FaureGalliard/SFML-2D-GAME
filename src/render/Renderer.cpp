@@ -11,6 +11,12 @@ Renderer::Renderer(const Tileset& tileset)
 
 Renderer::~Renderer() = default;
 
+void Renderer::setDebugMode(bool enabled) {
+    debugMode = enabled;
+    worldRenderer->setDebugMode(enabled);
+    entityRenderer->setDebugMode(enabled);
+}
+
 void Renderer::render(sf::RenderWindow& window,
                      const Camera& camera,
                      const std::vector<Chunk*>& visibleChunks,

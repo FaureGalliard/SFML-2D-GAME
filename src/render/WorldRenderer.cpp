@@ -29,16 +29,9 @@ sf::IntRect WorldRenderer::pickBasic(const Tile& tile) const {
 }
 
 sf::IntRect WorldRenderer::pickObjectRect(const WorldObject& obj) const {
-    // 🟢 Obtener información visual del tipo
     const ObjectVisual& visual = getObjectVisual(obj.type);
-
-    // 🟢 Clamp variant al rango válido (por seguridad)
     uint8_t variantIndex = obj.variant % visual.variants.size();
-
-    // 🟢 Obtener la variante específica
     const ObjectVariant& sprite = visual.variants[variantIndex];
-
-    // 🟢 Retornar el rect usando la posición y dimensiones
     return tileset.get(sprite.x, sprite.y, visual.width, visual.height);
 }
 
@@ -59,6 +52,32 @@ void WorldRenderer::drawChunkDebugBounds(sf::RenderWindow& window,
     window.draw(rect);
 }
 
+void WorldRenderer::drawObjectHitboxes(sf::RenderWindow& window,
+                                       const std::vector<Chunk*>& visibleChunks) const {
+    for (const Chunk* chunk : visibleChunks) {
+        for (const WorldObject& obj : chunk->worldObjects) {
+            sf::FloatRect bounds = obj.getCollisionBounds(chunk->cx, chunk->cy);
+
+            if (obj.hasCollision() && bounds.width > 0 && bounds.height > 0) {
+                sf::RectangleShape hitbox;
+                hitbox.setPosition(bounds.left, bounds.top);
+                hitbox.setSize(sf::Vector2f(bounds.width, bounds.height));
+                hitbox.setFillColor(sf::Color(255, 0, 0, 80));  // Rojo semi-transparente
+                hitbox.setOutlineColor(sf::Color::Red);
+                hitbox.setOutlineThickness(1.0f);
+
+                window.draw(hitbox);
+            }
+
+            sf::Vector2f worldPos = obj.getWorldPosition(chunk->cx, chunk->cy);
+            sf::CircleShape center(2.0f);
+            center.setPosition(worldPos.x - 2.0f, worldPos.y - 2.0f);
+            center.setFillColor(sf::Color::Yellow);
+            window.draw(center);
+        }
+    }
+}
+
 void WorldRenderer::draw(sf::RenderWindow& window,
                          const std::vector<Chunk*>& visibleChunks) {
     sf::RenderStates states;
@@ -74,5 +93,9 @@ void WorldRenderer::draw(sf::RenderWindow& window,
 
         window.draw(chunkPtr->mesh, states);
         window.draw(chunkPtr->objectMesh, states);
+    }
+
+    if (debugMode) {
+        drawObjectHitboxes(window, visibleChunks);
     }
 }

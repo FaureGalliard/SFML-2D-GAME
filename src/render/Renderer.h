@@ -9,9 +9,7 @@ class EntityRenderer;
 class Camera;
 class Hero;
 class Enemy;
-
 class Tileset;
-
 
 class Renderer {
 public:
@@ -24,11 +22,14 @@ public:
                 const Hero& hero,
                 const std::vector<const Enemy*>& visibleEnemies);
 
-
     WorldRenderer& getWorldRenderer();
     EntityRenderer& getEntityRenderer();
+
+    void setDebugMode(bool enabled);
+    bool isDebugMode() const { return debugMode; }
 
 private:
     std::unique_ptr<WorldRenderer> worldRenderer;
     std::unique_ptr<EntityRenderer> entityRenderer;
+    bool debugMode = false;  // NUEVO
 };
