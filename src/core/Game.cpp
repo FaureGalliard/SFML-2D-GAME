@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "core/Config.h"
+#include "systems/MovementSystem.h"
 
 Game::Game()
     : window(sf::VideoMode(1280, 720), "Save the Valley"),
@@ -20,8 +21,6 @@ Game::Game()
         CHUNK_SIZE * TILE_SIZE * 2.0f,
         CHUNK_SIZE * TILE_SIZE * 2.0f
     ));
-
-    hero.setWorld(&world);
 
     camera.setSize(sf::Vector2f(1280.0f, 720.0f));
     camera.setPosition(hero.getPosition());
@@ -52,7 +51,7 @@ void Game::processEvents() {
                 running = false;
             }
 
-            // NUEVO: Toggle debug con la tecla F3
+            // Toggle debug con la tecla F3
             if (event.key.code == sf::Keyboard::F3) {
                 bool currentDebug = renderer.isDebugMode();
                 renderer.setDebugMode(!currentDebug);
@@ -75,6 +74,8 @@ void Game::update(float dt) {
     }
 
     hero.update(dt);
+
+    MovementSystem::update(hero, world, dt);
 
     world.update(hero.getTileX(), hero.getTileY());
 

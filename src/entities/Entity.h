@@ -30,6 +30,8 @@ public:
 
     sf::FloatRect getBounds() const;
     void setBoundingBox(const sf::FloatRect& box) { boundingBox = box; }
+    sf::FloatRect getLocalBoundingBox() const { return boundingBox; }
+
 
     int getHealth() const { return health; }
     void setHealth(int h) { health = h; }
@@ -38,16 +40,12 @@ public:
     bool isFacingLeft() const { return facingLeft; }
     void setFacingLeft(bool left) { facingLeft = left; }
 
-    void applyCollisions(const World& world, float dt);
-
 protected:
     sf::Vector2f position;
     sf::Vector2f velocity;
     EntityState state;
-    sf::FloatRect boundingBox;
+    sf::FloatRect boundingBox;  // Bounding box relativo a position
     int health;
     int maxHealth;
     bool facingLeft;
-
-    sf::Vector2f tryMove(const World& world, const sf::Vector2f& newPosition);
 };

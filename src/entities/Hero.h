@@ -13,7 +13,6 @@ public:
     Hero(float x, float y);
 
     void update(float dt) override;
-    void setWorld(const World* w) { world = w; }  // NUEVO
 
     void moveInDirection(const sf::Vector2f& direction, bool running = false);
     void triggerAction(EntityState action);
@@ -26,7 +25,6 @@ public:
     const Animation* getCurrentAnimation() const;
 
 private:
-    const World* world = nullptr;  // NUEVO
     std::map<EntityState, std::unique_ptr<Animation>> animations;
     float speed;
     float runSpeedMultiplier;

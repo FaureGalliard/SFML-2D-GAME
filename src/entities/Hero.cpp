@@ -1,4 +1,5 @@
 #include "Hero.h"
+#include "systems/MovementSystem.h"
 #include <cmath>
 
 Hero::Hero()
@@ -55,9 +56,6 @@ void Hero::update(float dt) {
     updateAnimations(dt);
 
 
-    applyCollisions(*world, dt);
-
-    // Actualizar dirección
     if (velocity.x < 0) {
         facingLeft = true;
     } else if (velocity.x > 0) {
