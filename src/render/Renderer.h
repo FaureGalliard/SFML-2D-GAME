@@ -10,6 +10,24 @@ class Camera;
 class Hero;
 class Enemy;
 class Tileset;
+struct WorldObject;
+
+enum class RenderableType {
+    WorldObject,
+    Hero,
+    Enemy
+};
+
+struct RenderableObject {
+    RenderableType type;
+    float depth;
+    float x;
+
+    const Chunk* chunk;
+    const WorldObject* worldObject;
+    const Hero* hero;
+    const Enemy* enemy;
+};
 
 class Renderer {
 public:
@@ -31,5 +49,5 @@ public:
 private:
     std::unique_ptr<WorldRenderer> worldRenderer;
     std::unique_ptr<EntityRenderer> entityRenderer;
-    bool debugMode = false;  // NUEVO
+    bool debugMode = false;
 };

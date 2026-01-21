@@ -9,8 +9,6 @@ InputSystem::InputSystem() {
         {sf::Keyboard::Q, EntityState::Watering},
         {sf::Keyboard::F, EntityState::Dig},
         {sf::Keyboard::G, EntityState::Mining},
-        {sf::Keyboard::H, EntityState::Hurt},
-        {sf::Keyboard::J, EntityState::Death}
     };
 }
 
@@ -19,10 +17,7 @@ void InputSystem::update() {
     updateKey(sf::Keyboard::A);
     updateKey(sf::Keyboard::S);
     updateKey(sf::Keyboard::D);
-    updateKey(sf::Keyboard::Up);
-    updateKey(sf::Keyboard::Left);
-    updateKey(sf::Keyboard::Down);
-    updateKey(sf::Keyboard::Right);
+
     updateKey(sf::Keyboard::LShift);
 
     for (const auto& [key, action] : actionKeyMap) {
@@ -48,21 +43,21 @@ bool InputSystem::wasKeyJustPressed(sf::Keyboard::Key key) const {
 sf::Vector2f InputSystem::getMoveDirection() const {
     sf::Vector2f direction(0.0f, 0.0f);
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)
+      ) {
         direction.x += 1.0f;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)
+        ) {
         direction.x -= 1.0f;
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)
+        ) {
         direction.y += 1.0f;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)
+        ) {
         direction.y -= 1.0f;
     }
 

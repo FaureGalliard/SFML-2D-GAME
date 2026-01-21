@@ -45,7 +45,7 @@ static const std::unordered_map<WorldObjectType, ObjectVisual> visuals = {
         2, 3,
         {{51, 6}},
         true,
-        sf::FloatRect(-3.0f, -36.0f, 6.0f, 12.0f)  // tronco más ancho
+        sf::FloatRect(-3.0f, -26.0f, 6.0f, 8.0f)  // tronco más ancho
     )}
 };
 

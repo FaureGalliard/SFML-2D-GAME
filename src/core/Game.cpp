@@ -26,7 +26,7 @@ Game::Game()
     camera.setSize(sf::Vector2f(1280.0f, 720.0f));
     camera.setPosition(hero.getPosition());
 
-    renderer.setDebugMode(true);
+    renderer.setDebugMode(false);
 }
 
 void Game::run() {

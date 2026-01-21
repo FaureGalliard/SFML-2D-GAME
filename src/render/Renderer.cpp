@@ -3,6 +3,9 @@
 #include "EntityRenderer.h"
 #include "Camera.h"
 #include "world/Chunk.h"
+#include "entities/Hero.h"
+#include "entities/Enemy.h"
+#include <algorithm>
 
 Renderer::Renderer(const Tileset& tileset)
     : worldRenderer(std::make_unique<WorldRenderer>(tileset)),
@@ -28,13 +31,95 @@ void Renderer::render(sf::RenderWindow& window,
     sf::View view = camera.getView();
     window.setView(view);
 
-    worldRenderer->draw(window, visibleChunks);
+    worldRenderer->drawTiles(window, visibleChunks);
 
-    for (const Enemy* enemy : visibleEnemies) {
-        entityRenderer->drawEnemy(window, *enemy);
+    std::vector<RenderableObject> renderables;
+
+    for (Chunk* chunk : visibleChunks) {
+        for (const WorldObject& obj : chunk->worldObjects) {
+
+            float depthY, leftX;
+
+            if (obj.hasCollision()) {
+                sf::FloatRect objBounds = obj.getCollisionBounds(chunk->cx, chunk->cy);
+                depthY = objBounds.top + objBounds.height;
+                leftX = objBounds.left;
+            } else {
+                sf::Vector2f worldPos = obj.getWorldPosition(chunk->cx, chunk->cy);
+                depthY = worldPos.y;
+                leftX = worldPos.x;
+            }
+
+            renderables.push_back({
+                RenderableType::WorldObject,
+                depthY,
+                leftX,
+                chunk,
+                &obj,
+                nullptr,
+                nullptr
+            });
+        }
     }
 
-    entityRenderer->drawHero(window, hero);
+    {
+        sf::FloatRect heroBounds = hero.getBounds();
+        float heroBottomY = heroBounds.top + heroBounds.height;
+        float heroLeftX = heroBounds.left;
+
+        renderables.push_back({
+            RenderableType::Hero,
+            heroBottomY,
+            heroLeftX,
+            nullptr,
+            nullptr,
+            &hero,
+            nullptr
+        });
+    }
+
+    for (const Enemy* enemy : visibleEnemies) {
+        sf::FloatRect enemyBounds = enemy->getBounds();
+        float enemyBottomY = enemyBounds.top + enemyBounds.height;
+        float enemyLeftX = enemyBounds.left;
+
+        renderables.push_back({
+            RenderableType::Enemy,
+            enemyBottomY,
+            enemyLeftX,
+            nullptr,
+            nullptr,
+            nullptr,
+            enemy
+        });
+    }
+
+    std::sort(renderables.begin(), renderables.end(),
+        [](const RenderableObject& a, const RenderableObject& b) {
+
+            if (a.depth != b.depth) {
+                return a.depth < b.depth;
+            }
+
+
+            return a.x < b.x;
+        });
+
+    for (const RenderableObject& renderable : renderables) {
+        switch (renderable.type) {
+            case RenderableType::WorldObject:
+                worldRenderer->drawObject(window, *renderable.chunk, *renderable.worldObject);
+                break;
+
+            case RenderableType::Hero:
+                entityRenderer->drawHero(window, *renderable.hero);
+                break;
+
+            case RenderableType::Enemy:
+                entityRenderer->drawEnemy(window, *renderable.enemy);
+                break;
+        }
+    }
 
     window.display();
 }

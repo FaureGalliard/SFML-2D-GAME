@@ -62,7 +62,7 @@ void WorldRenderer::drawObjectHitboxes(sf::RenderWindow& window,
                 sf::RectangleShape hitbox;
                 hitbox.setPosition(bounds.left, bounds.top);
                 hitbox.setSize(sf::Vector2f(bounds.width, bounds.height));
-                hitbox.setFillColor(sf::Color(255, 0, 0, 80));  // Rojo semi-transparente
+                hitbox.setFillColor(sf::Color(255, 0, 0, 80));
                 hitbox.setOutlineColor(sf::Color::Red);
                 hitbox.setOutlineThickness(1.0f);
 
@@ -75,6 +75,69 @@ void WorldRenderer::drawObjectHitboxes(sf::RenderWindow& window,
             center.setFillColor(sf::Color::Yellow);
             window.draw(center);
         }
+    }
+}
+
+void WorldRenderer::drawTiles(sf::RenderWindow& window,
+                              const std::vector<Chunk*>& visibleChunks) {
+    sf::RenderStates states;
+    states.texture = &tileset.texture();
+
+    for (Chunk* chunkPtr : visibleChunks) {
+        if (!chunkPtr->isMeshBuilt()) {
+            chunkPtr->buildMesh(*this);
+        }
+
+        // Solo dibujar el mesh de tiles
+        window.draw(chunkPtr->mesh, states);
+    }
+}
+
+void WorldRenderer::drawObject(sf::RenderWindow& window,
+                               const Chunk& chunk,
+                               const WorldObject& obj) {
+    sf::RenderStates states;
+    states.texture = &tileset.texture();
+
+    sf::IntRect texRect = pickObjectRect(obj);
+
+    sf::Vector2f worldPos = obj.getWorldPosition(chunk.cx, chunk.cy);
+    float px = worldPos.x - texRect.width * 0.5f;
+    float py = worldPos.y - texRect.height;
+
+    sf::VertexArray quad(sf::Quads, 4);
+
+    quad[0].position = {px, py};
+    quad[1].position = {px + texRect.width, py};
+    quad[2].position = {px + texRect.width, py + texRect.height};
+    quad[3].position = {px, py + texRect.height};
+
+    quad[0].texCoords = {float(texRect.left), float(texRect.top)};
+    quad[1].texCoords = {float(texRect.left + texRect.width), float(texRect.top)};
+    quad[2].texCoords = {float(texRect.left + texRect.width), float(texRect.top + texRect.height)};
+    quad[3].texCoords = {float(texRect.left), float(texRect.top + texRect.height)};
+
+    window.draw(quad, states);
+
+    if (debugMode) {
+        if (obj.hasCollision()) {
+            sf::FloatRect bounds = obj.getCollisionBounds(chunk.cx, chunk.cy);
+            if (bounds.width > 0 && bounds.height > 0) {
+                sf::RectangleShape hitbox;
+                hitbox.setPosition(bounds.left, bounds.top);
+                hitbox.setSize(sf::Vector2f(bounds.width, bounds.height));
+                hitbox.setFillColor(sf::Color(255, 0, 0, 80));
+                hitbox.setOutlineColor(sf::Color::Red);
+                hitbox.setOutlineThickness(1.0f);
+                window.draw(hitbox);
+            }
+        }
+
+        // Punto central
+        sf::CircleShape center(2.0f);
+        center.setPosition(worldPos.x - 2.0f, worldPos.y - 2.0f);
+        center.setFillColor(sf::Color::Yellow);
+        window.draw(center);
     }
 }
 
