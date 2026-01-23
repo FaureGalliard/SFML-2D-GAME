@@ -32,13 +32,19 @@ public:
     void setBoundingBox(const sf::FloatRect& box) { boundingBox = box; }
     sf::FloatRect getLocalBoundingBox() const { return boundingBox; }
 
-
     int getHealth() const { return health; }
     void setHealth(int h) { health = h; }
+    int getMaxHealth() const { return maxHealth; }
+    void setMaxHealth(int h) { maxHealth = h; }
     bool isAlive() const { return health > 0; }
 
     bool isFacingLeft() const { return facingLeft; }
     void setFacingLeft(bool left) { facingLeft = left; }
+
+    // Sistema de daño
+    void takeDamage(int damage);
+    bool isInvulnerable() const { return invulnerable; }
+    void updateInvulnerability(float dt);
 
 protected:
     sf::Vector2f position;
@@ -48,4 +54,8 @@ protected:
     int health;
     int maxHealth;
     bool facingLeft;
+
+    // Invulnerabilidad temporal después de recibir daño
+    bool invulnerable;
+    float invulnerabilityTimer;
 };

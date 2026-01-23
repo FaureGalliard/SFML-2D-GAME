@@ -8,6 +8,8 @@ Entity::Entity()
     , health(100)
     , maxHealth(100)
     , facingLeft(false)
+    , invulnerable(false)
+    , invulnerabilityTimer(0.0f)
 {
 }
 
@@ -19,6 +21,8 @@ Entity::Entity(float x, float y)
     , health(100)
     , maxHealth(100)
     , facingLeft(false)
+    , invulnerable(false)
+    , invulnerabilityTimer(0.0f)
 {
 }
 
@@ -33,4 +37,29 @@ sf::FloatRect Entity::getBounds() const {
         boundingBox.width,
         boundingBox.height
     );
+}
+
+void Entity::takeDamage(int damage) {
+    if (invulnerable || !isAlive()) {
+        return;
+    }
+
+    health -= damage;
+    if (health < 0) {
+        health = 0;
+    }
+
+    // Activar invulnerabilidad temporal
+    invulnerable = true;
+    invulnerabilityTimer = 0.5f;  // 0.5 segundos de invulnerabilidad
+}
+
+void Entity::updateInvulnerability(float dt) {
+    if (invulnerable) {
+        invulnerabilityTimer -= dt;
+        if (invulnerabilityTimer <= 0.0f) {
+            invulnerable = false;
+            invulnerabilityTimer = 0.0f;
+        }
+    }
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <vector>
 
 class Hero;
@@ -19,7 +20,7 @@ public:
 
 private:
     std::vector<sf::Sprite> sprites;
-    bool debugMode = false;  // NUEVO
+    bool debugMode = false;
 
     void drawAnimation(sf::RenderWindow& window,
                       const Animation* animation,
@@ -27,4 +28,9 @@ private:
                       bool facingLeft);
 
     void drawEntityHitbox(sf::RenderWindow& window, const sf::FloatRect& bounds) const;
+    void drawAttackHitbox(sf::RenderWindow& window, const sf::FloatRect& bounds) const;
+    void drawHealthBar(sf::RenderWindow& window,
+                      const sf::Vector2f& position,
+                      int currentHealth,
+                      int maxHealth) const;
 };

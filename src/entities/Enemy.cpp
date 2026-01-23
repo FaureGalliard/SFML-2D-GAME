@@ -6,6 +6,10 @@ Enemy::Enemy()
     , speed(100.0f)
     , runSpeedMultiplier(2.0f)
 {
+    // Los enemigos tienen menos vida
+    health = 40;
+    maxHealth = 40;
+
     initAnimations();
     setState(EntityState::Idle);
 }
@@ -15,6 +19,10 @@ Enemy::Enemy(float x, float y)
     , speed(100.0f)
     , runSpeedMultiplier(2.0f)
 {
+    // Los enemigos tienen menos vida
+    health = 40;
+    maxHealth = 40;
+
     initAnimations();
     setState(EntityState::Idle);
 }
@@ -38,8 +46,25 @@ void Enemy::addAnimation(EntityState state,
 }
 
 void Enemy::update(float dt) {
-    handleStateTransitions();
+    // Actualizar invulnerabilidad
+    updateInvulnerability(dt);
 
+    // Si está muerto, no hacer nada más
+    if (!isAlive() && state != EntityState::Death) {
+        setState(EntityState::Death);
+        velocity = {0.0f, 0.0f};
+        if (auto anim = animations.find(EntityState::Death); anim != animations.end()) {
+            anim->second->reset();
+        }
+    }
+
+    // Si está en animación de muerte, solo actualizar la animación
+    if (state == EntityState::Death) {
+        updateAnimations(dt);
+        return;
+    }
+
+    handleStateTransitions();
     updateAnimations(dt);
 
     position += velocity * dt;
@@ -52,6 +77,12 @@ void Enemy::update(float dt) {
 }
 
 void Enemy::moveInDirection(const sf::Vector2f& direction, bool running) {
+    // No moverse si está muerto o herido
+    if (!isAlive() || state == EntityState::Hurt || state == EntityState::Death) {
+        velocity = {0.0f, 0.0f};
+        return;
+    }
+
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
     if (length > 0) {
@@ -64,6 +95,11 @@ void Enemy::moveInDirection(const sf::Vector2f& direction, bool running) {
 }
 
 void Enemy::triggerAction(EntityState action) {
+    // No permitir acciones si está muerto
+    if (!isAlive() && action != EntityState::Death) {
+        return;
+    }
+
     if (auto it = animations.find(state); it != animations.end()) {
         if (it->second->isLooping() || it->second->isFinished()) {
             setState(action);
@@ -82,6 +118,17 @@ void Enemy::updateAnimations(float dt) {
 
 void Enemy::handleStateTransitions() {
     if (auto it = animations.find(state); it != animations.end()) {
+        // Si no está vivo, mantener en Death
+        if (!isAlive()) {
+            if (state != EntityState::Death) {
+                setState(EntityState::Death);
+                if (auto newAnim = animations.find(EntityState::Death); newAnim != animations.end()) {
+                    newAnim->second->reset();
+                }
+            }
+            return;
+        }
+
         if (!it->second->isLooping() && it->second->isFinished()) {
             float velLength = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
 

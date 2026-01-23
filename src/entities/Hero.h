@@ -24,6 +24,9 @@ public:
     Animation* getCurrentAnimation();
     const Animation* getCurrentAnimation() const;
 
+    // Verificar si está atacando
+    bool isAttacking() const;
+
 private:
     std::map<EntityState, std::unique_ptr<Animation>> animations;
     float speed;

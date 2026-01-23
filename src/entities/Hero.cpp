@@ -52,9 +52,26 @@ void Hero::addAnimation(EntityState state,
 }
 
 void Hero::update(float dt) {
+    // Actualizar invulnerabilidad
+    updateInvulnerability(dt);
+
+    // Si está muerto, no hacer nada más
+    if (!isAlive() && state != EntityState::Death) {
+        setState(EntityState::Death);
+        velocity = {0.0f, 0.0f};
+        if (auto anim = animations.find(EntityState::Death); anim != animations.end()) {
+            anim->second->reset();
+        }
+    }
+
+    // Si está en animación de muerte, solo actualizar la animación
+    if (state == EntityState::Death) {
+        updateAnimations(dt);
+        return;
+    }
+
     handleStateTransitions();
     updateAnimations(dt);
-
 
     if (velocity.x < 0) {
         facingLeft = true;
@@ -64,6 +81,12 @@ void Hero::update(float dt) {
 }
 
 void Hero::moveInDirection(const sf::Vector2f& direction, bool running) {
+    // No moverse durante ataques, herido o muerto
+    if (isAttacking() || state == EntityState::Hurt || !isAlive()) {
+        velocity = {0.0f, 0.0f};
+        return;
+    }
+
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
     if (length > 0) {
@@ -76,11 +99,21 @@ void Hero::moveInDirection(const sf::Vector2f& direction, bool running) {
 }
 
 void Hero::triggerAction(EntityState action) {
+    // No permitir acciones si está muerto
+    if (!isAlive()) {
+        return;
+    }
+
     if (auto it = animations.find(state); it != animations.end()) {
         if (it->second->isLooping() || it->second->isFinished()) {
             setState(action);
             if (auto newAnim = animations.find(action); newAnim != animations.end()) {
                 newAnim->second->reset();
+            }
+
+            // Detener movimiento al atacar
+            if (isAttacking()) {
+                velocity = {0.0f, 0.0f};
             }
         }
     }
@@ -94,6 +127,17 @@ void Hero::updateAnimations(float dt) {
 
 void Hero::handleStateTransitions() {
     if (auto it = animations.find(state); it != animations.end()) {
+        // Si no está vivo, mantener en Death
+        if (!isAlive()) {
+            if (state != EntityState::Death) {
+                setState(EntityState::Death);
+                if (auto newAnim = animations.find(EntityState::Death); newAnim != animations.end()) {
+                    newAnim->second->reset();
+                }
+            }
+            return;
+        }
+
         if (!it->second->isLooping() && it->second->isFinished()) {
             float velLength = std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
 
@@ -133,6 +177,12 @@ void Hero::handleStateTransitions() {
             }
         }
     }
+}
+
+bool Hero::isAttacking() const {
+    return state == EntityState::Attack ||
+           state == EntityState::Axe ||
+           state == EntityState::Hammering;
 }
 
 Animation* Hero::getCurrentAnimation() {

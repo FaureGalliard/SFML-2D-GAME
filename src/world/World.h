@@ -39,6 +39,9 @@ public:
 
     std::vector<const Enemy*> getVisibleEnemies(const sf::FloatRect& cameraBounds) const;
 
+    // Obtener enemigos mutables para el sistema de combate
+    std::vector<Enemy*> getEnemies();
+
     const Tile* getTileGlobal(int wx, int wy) const;
 
     Chunk* getChunk(int cx, int cy);

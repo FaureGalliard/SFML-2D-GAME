@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "core/Config.h"
 #include "systems/MovementSystem.h"
+#include "systems/CombatSystem.h"
 
 Game::Game()
     : window(sf::VideoMode(1280, 720), "Save the Valley"),
@@ -76,6 +77,10 @@ void Game::update(float dt) {
     hero.update(dt);
 
     MovementSystem::update(hero, world, dt);
+
+    // Sistema de combate - verificar si el hero golpea enemigos
+    std::vector<Enemy*> enemies = world.getEnemies();
+    CombatSystem::update(hero, enemies, dt);
 
     world.update(hero.getTileX(), hero.getTileY());
 

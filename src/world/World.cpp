@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <cmath>
 #include <random>
+#include <algorithm>
 
 static int floorDiv(int a, int b) {
     int r = a / b;
@@ -46,6 +47,20 @@ void World::update(int playerTileX, int playerTileY) {
         enemy.update(1.0f / 60.0f);
         MovementSystem::update(enemy, *this, 1.0f / 60.0f);
     }
+
+    // Eliminar enemigos muertos después de que termine su animación de muerte
+    enemies.erase(
+        std::remove_if(enemies.begin(), enemies.end(),
+            [](const Enemy& e) {
+                if (!e.isAlive() && e.getState() == EntityState::Death) {
+                    const Animation* anim = e.getCurrentAnimation();
+                    return anim && anim->isFinished();
+                }
+                return false;
+            }
+        ),
+        enemies.end()
+    );
 }
 
 void World::loadChunk(int cx, int cy) {
@@ -151,6 +166,14 @@ std::vector<const Enemy*> World::getVisibleEnemies(const sf::FloatRect& cameraBo
         }
     }
 
+    return result;
+}
+
+std::vector<Enemy*> World::getEnemies() {
+    std::vector<Enemy*> result;
+    for (Enemy& enemy : enemies) {
+        result.push_back(&enemy);
+    }
     return result;
 }
 
