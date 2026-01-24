@@ -7,7 +7,7 @@
 #include <set>
 
 struct AttackTracker {
-    std::set<const Enemy*> hitEnemies;  // Enemigos ya golpeados
+    std::set<const Enemy*> hitEnemies;
     EntityState lastState = EntityState::Idle;
 };
 
@@ -38,7 +38,7 @@ sf::FloatRect CombatSystem::getAttackHitbox(const Hero& hero, EntityState attack
 
     float attackWidth = 20.0f;
     float attackHeight = 20.0f;
-    float attackRange = 5.0f;  // Distancia del ataque desde el centro del hero
+    float attackRange = 5.0f;
 
     switch (attackType) {
         case EntityState::Attack:

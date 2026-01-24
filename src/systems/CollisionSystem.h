@@ -32,14 +32,12 @@ public:
         return a.intersects(b);
     }
 
-    // Verificar si una entidad puede moverse a una nueva posición
     static bool canMoveTo(
         const Entity& entity,
         const World& world,
         const sf::Vector2f& newPosition
     );
 
-    // Verificar colisión entre dos entidades
     static bool checkEntityCollision(
         const Entity& entity1,
         const Entity& entity2

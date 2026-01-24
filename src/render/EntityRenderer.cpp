@@ -14,16 +14,11 @@ void EntityRenderer::drawHero(sf::RenderWindow& window, const Hero& hero) {
         return;
     }
 
-    // Parpadeo si está invulnerable
     if (hero.isInvulnerable()) {
-        // Alternar visibilidad cada 0.1 segundos
         static float blinkTimer = 0.0f;
         blinkTimer += 1.0f / 60.0f;
         if (static_cast<int>(blinkTimer * 10) % 2 == 0) {
-            // No dibujar en frames pares
             if (debugMode) {
-                drawEntityHitbox(window, hero.getBounds());
-                // Dibujar hitbox de ataque si está atacando
                 if (hero.isAttacking()) {
                     sf::FloatRect attackHitbox = CombatSystem::getAttackHitbox(hero, hero.getState());
                     drawAttackHitbox(window, attackHitbox);
@@ -38,13 +33,11 @@ void EntityRenderer::drawHero(sf::RenderWindow& window, const Hero& hero) {
     if (debugMode) {
         drawEntityHitbox(window, hero.getBounds());
 
-        // Dibujar hitbox de ataque si está atacando
         if (hero.isAttacking()) {
             sf::FloatRect attackHitbox = CombatSystem::getAttackHitbox(hero, hero.getState());
             drawAttackHitbox(window, attackHitbox);
         }
 
-        // Mostrar vida
         drawHealthBar(window, hero.getPosition(), hero.getHealth(), hero.getMaxHealth());
     }
 }
@@ -55,7 +48,6 @@ void EntityRenderer::drawEnemy(sf::RenderWindow& window, const Enemy& enemy) {
         return;
     }
 
-    // Parpadeo si está invulnerable
     if (enemy.isInvulnerable()) {
         static float blinkTimer = 0.0f;
         blinkTimer += 1.0f / 60.0f;
@@ -107,7 +99,6 @@ void EntityRenderer::drawHealthBar(sf::RenderWindow& window,
     float barHeight = 5.0f;
     float healthPercent = static_cast<float>(currentHealth) / static_cast<float>(maxHealth);
 
-    // Fondo de la barra
     sf::RectangleShape background;
     background.setPosition(position.x - barWidth / 2.0f, position.y - 55.0f);
     background.setSize(sf::Vector2f(barWidth, barHeight));
@@ -115,12 +106,10 @@ void EntityRenderer::drawHealthBar(sf::RenderWindow& window,
     background.setOutlineColor(sf::Color::Black);
     background.setOutlineThickness(1.0f);
 
-    // Barra de vida
     sf::RectangleShape healthBar;
     healthBar.setPosition(position.x - barWidth / 2.0f, position.y - 55.0f);
     healthBar.setSize(sf::Vector2f(barWidth * healthPercent, barHeight));
 
-    // Color según el porcentaje de vida
     if (healthPercent > 0.6f) {
         healthBar.setFillColor(sf::Color::Green);
     } else if (healthPercent > 0.3f) {

@@ -10,11 +10,11 @@ class Enemy;
 class World;
 
 struct AttackInfo {
-    sf::FloatRect hitbox;  // Hitbox del ataque en coordenadas del mundo
+    sf::FloatRect hitbox;
     int damage;
     bool active;
-    float duration;        // Duración del ataque en segundos
-    float elapsed;         // Tiempo transcurrido
+    float duration;
+    float elapsed;
 };
 
 class CombatSystem {
@@ -34,6 +34,5 @@ public:
     static sf::FloatRect getAttackHitbox(const Hero& hero, EntityState attackType);
 
 private:
-    // Verificar si un estado es un ataque
     static bool isAttackState(EntityState state);
 };

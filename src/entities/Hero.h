@@ -24,7 +24,6 @@ public:
     Animation* getCurrentAnimation();
     const Animation* getCurrentAnimation() const;
 
-    // Verificar si está atacando
     bool isAttacking() const;
 
 private:

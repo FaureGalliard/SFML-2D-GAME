@@ -6,31 +6,26 @@
 #include <random>
 #include <cmath>
 
-// Generador de números aleatorios
 static std::random_device rd;
 static std::mt19937 gen(rd());
 
 void AISystem::update(std::vector<Enemy*>& enemies, const World& world, float dt) {
-    // Mapa estático para mantener el componente de IA de cada enemigo
     static std::map<Enemy*, AIComponent> aiComponents;
 
     for (Enemy* enemy : enemies) {
         if (!enemy) continue;
         if (!enemy->isAlive()) continue;
 
-        // Si el enemigo está herido o muriendo, no procesar IA
         if (enemy->getState() == EntityState::Hurt ||
             enemy->getState() == EntityState::Death) {
             continue;
         }
 
-        // Obtener o crear el componente de IA para este enemigo
         AIComponent& ai = aiComponents[enemy];
 
         updateEnemy(*enemy, ai, world, dt);
     }
 
-    // Limpiar componentes de IA de enemigos que ya no existen
     for (auto it = aiComponents.begin(); it != aiComponents.end();) {
         bool found = false;
         for (Enemy* enemy : enemies) {
@@ -49,10 +44,8 @@ void AISystem::update(std::vector<Enemy*>& enemies, const World& world, float dt
 }
 
 void AISystem::updateEnemy(Enemy& enemy, AIComponent& ai, const World& world, float dt) {
-    // Actualizar el timer del estado
     ai.stateTimer -= dt;
 
-    // Si el timer se acabó, cambiar de estado
     if (ai.stateTimer <= 0.0f) {
         // Alternar entre Idle y Wandering
         if (ai.currentState == AIState::Idle) {
@@ -64,23 +57,17 @@ void AISystem::updateEnemy(Enemy& enemy, AIComponent& ai, const World& world, fl
         }
     }
 
-    // Verificar si el enemigo está atascado o chocó con algo
     if (ai.currentState == AIState::Wandering) {
-        // Predecir la próxima posición
         sf::Vector2f currentPos = enemy.getPosition();
-        float speed = 100.0f; // Debe coincidir con la velocidad del enemigo
+        float speed = 100.0f;
         sf::Vector2f velocity = ai.moveDirection * speed;
         sf::Vector2f nextPos = currentPos + velocity * dt * 5.0f; // Mirar un poco adelante
 
-        // Verificar si puede moverse a esa posición
         if (!CollisionSystem::canMoveTo(enemy, world, nextPos)) {
-            // Hay una colisión, cambiar de dirección
             ai.moveDirection = generateRandomDirection();
 
-            // Verificar la nueva dirección también
             nextPos = currentPos + ai.moveDirection * speed * dt * 5.0f;
 
-            // Si tampoco puede moverse en la nueva dirección, quedarse quieto temporalmente
             if (!CollisionSystem::canMoveTo(enemy, world, nextPos)) {
                 changeState(ai, AIState::Idle);
                 ai.stateTimer = getRandomStateTime(AIState::Idle) * 0.5f; // Tiempo más corto
@@ -89,7 +76,6 @@ void AISystem::updateEnemy(Enemy& enemy, AIComponent& ai, const World& world, fl
         }
     }
 
-    // Aplicar el movimiento según el estado
     switch (ai.currentState) {
         case AIState::Idle:
             enemy.moveInDirection({0.0f, 0.0f}, false);
@@ -108,14 +94,12 @@ sf::Vector2f AISystem::generateRandomDirection() {
     direction.x = dist(gen);
     direction.y = dist(gen);
 
-    // Normalizar el vector
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
     if (length > 0.0f) {
         direction.x /= length;
         direction.y /= length;
     } else {
-        // Si por casualidad es (0,0), dar una dirección por defecto
         direction = {1.0f, 0.0f};
     }
 
@@ -132,12 +116,10 @@ float AISystem::getRandomStateTime(AIState state) {
 
     switch (state) {
         case AIState::Idle:
-            // Estar quieto entre 1 y 3 segundos
             dist = std::uniform_real_distribution<float>(1.0f, 3.0f);
             break;
 
         case AIState::Wandering:
-            // Moverse entre 2 y 4 segundos
             dist = std::uniform_real_distribution<float>(2.0f, 4.0f);
             break;
 
