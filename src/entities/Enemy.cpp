@@ -3,8 +3,8 @@
 
 Enemy::Enemy()
     : Entity()
-    , speed(100.0f)
-    , runSpeedMultiplier(2.0f)
+    , speed(50.0f)
+    , runSpeedMultiplier(1.5f)
 {
     // Los enemigos tienen menos vida
     health = 40;
@@ -16,8 +16,8 @@ Enemy::Enemy()
 
 Enemy::Enemy(float x, float y)
     : Entity(x, y)
-    , speed(100.0f)
-    , runSpeedMultiplier(2.0f)
+    , speed(50.0f)
+    , runSpeedMultiplier(1.5f)
 {
     // Los enemigos tienen menos vida
     health = 40;

@@ -3,6 +3,7 @@
 #include "generation/ObjectSpawner.h"
 #include "generation/BiomeNoise.h"
 #include "systems/MovementSystem.h"
+#include "systems/AISystem.h"
 #include <unordered_set>
 #include <cmath>
 #include <random>
@@ -43,6 +44,13 @@ void World::update(int playerTileX, int playerTileY) {
 
     unloadFarChunks(centerCx, centerCy);
 
+    // Obtener punteros mutables a enemigos para la IA
+    std::vector<Enemy*> enemyPtrs = getEnemies();
+
+    // Actualizar IA de enemigos
+    AISystem::update(enemyPtrs, *this, 1.0f / 60.0f);
+
+    // Actualizar enemigos
     for (Enemy& enemy : enemies) {
         enemy.update(1.0f / 60.0f);
         MovementSystem::update(enemy, *this, 1.0f / 60.0f);
