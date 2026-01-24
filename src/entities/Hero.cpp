@@ -25,8 +25,8 @@ void Hero::initAnimations() {
     addAnimation(EntityState::Walking,   "WALKING",   "walk_strip8.png",        {8, 1});
     addAnimation(EntityState::Running,   "RUN",       "run_strip8.png",         {8, 1});
     addAnimation(EntityState::Attack,    "ATTACK",    "attack_strip10.png",     {10, 1}, 0.1f, false);
-    addAnimation(EntityState::Axe,       "AXE",       "axe_strip10.png",        {10, 1}, 0.1f, false);
-    addAnimation(EntityState::Hammering, "HAMMERING", "hammering_strip23.png",  {23, 1}, 0.1f, false);
+    addAnimation(EntityState::Axe,       "AXE",       "axe_strip10.png",        {10, 1}, 0.09f, false);
+    addAnimation(EntityState::Hammering, "HAMMERING", "hammering_strip23.png",  {23, 1}, 0.08f, false);
     addAnimation(EntityState::Roll,      "ROLL",      "roll_strip10.png",       {10, 1}, 0.1f, false);
     addAnimation(EntityState::Dig,       "DIG",       "dig_strip13.png",        {13, 1}, 0.1f, false);
     addAnimation(EntityState::Watering,  "WATERING",  "watering_strip5.png",    {5, 1}, 0.1f, false);
@@ -52,10 +52,8 @@ void Hero::addAnimation(EntityState state,
 }
 
 void Hero::update(float dt) {
-    // Actualizar invulnerabilidad
     updateInvulnerability(dt);
 
-    // Si está muerto, no hacer nada más
     if (!isAlive() && state != EntityState::Death) {
         setState(EntityState::Death);
         velocity = {0.0f, 0.0f};
@@ -64,7 +62,6 @@ void Hero::update(float dt) {
         }
     }
 
-    // Si está en animación de muerte, solo actualizar la animación
     if (state == EntityState::Death) {
         updateAnimations(dt);
         return;
@@ -81,8 +78,7 @@ void Hero::update(float dt) {
 }
 
 void Hero::moveInDirection(const sf::Vector2f& direction, bool running) {
-    // No moverse durante ataques, herido o muerto
-    if (isAttacking() || state == EntityState::Hurt || !isAlive()) {
+    if (state == EntityState::Hurt || !isAlive()) {
         velocity = {0.0f, 0.0f};
         return;
     }
@@ -99,7 +95,6 @@ void Hero::moveInDirection(const sf::Vector2f& direction, bool running) {
 }
 
 void Hero::triggerAction(EntityState action) {
-    // No permitir acciones si está muerto
     if (!isAlive()) {
         return;
     }
@@ -109,11 +104,6 @@ void Hero::triggerAction(EntityState action) {
             setState(action);
             if (auto newAnim = animations.find(action); newAnim != animations.end()) {
                 newAnim->second->reset();
-            }
-
-            // Detener movimiento al atacar
-            if (isAttacking()) {
-                velocity = {0.0f, 0.0f};
             }
         }
     }
@@ -182,7 +172,9 @@ void Hero::handleStateTransitions() {
 bool Hero::isAttacking() const {
     return state == EntityState::Attack ||
            state == EntityState::Axe ||
-           state == EntityState::Hammering;
+           state == EntityState::Hammering ||
+           state == EntityState::Mining ||
+           state == EntityState::Dig;
 }
 
 Animation* Hero::getCurrentAnimation() {

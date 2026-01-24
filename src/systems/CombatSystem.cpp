@@ -3,12 +3,20 @@
 #include "entities/Enemy.h"
 #include "core/Config.h"
 #include <cmath>
+#include <map>
+#include <set>
+
+struct AttackTracker {
+    std::set<const Enemy*> hitEnemies;  // Enemigos ya golpeados
+    EntityState lastState = EntityState::Idle;
+};
+
+static std::map<const Hero*, AttackTracker> attackTrackers;
 
 bool CombatSystem::isAttackState(EntityState state) {
     return state == EntityState::Attack ||
            state == EntityState::Axe ||
            state == EntityState::Hammering;
-
 }
 
 int CombatSystem::getAttackDamage(EntityState attackType) {
@@ -18,7 +26,7 @@ int CombatSystem::getAttackDamage(EntityState attackType) {
         case EntityState::Axe:
             return 20;
         case EntityState::Hammering:
-            return 40;
+            return 15;
         default:
             return 0;
     }
@@ -28,15 +36,13 @@ sf::FloatRect CombatSystem::getAttackHitbox(const Hero& hero, EntityState attack
     sf::Vector2f heroPos = hero.getPosition();
     bool facingLeft = hero.isFacingLeft();
 
-    // Hitbox base del ataque (relativo a la posición del hero)
     float attackWidth = 20.0f;
     float attackHeight = 20.0f;
     float attackRange = 5.0f;  // Distancia del ataque desde el centro del hero
 
-    // Ajustar según el tipo de ataque
     switch (attackType) {
         case EntityState::Attack:
-            attackWidth = 20.0f;
+            attackWidth = 25.0f;
             attackHeight = 20.0f;
             attackRange = 0.0f;
             break;
@@ -52,23 +58,19 @@ sf::FloatRect CombatSystem::getAttackHitbox(const Hero& hero, EntityState attack
             attackHeight = 20.0f;
             attackRange = 20.0f;
             break;
-
-
         default:
             break;
     }
 
-    // Calcular la posición del hitbox según la dirección
     float hitboxX, hitboxY;
 
     if (facingLeft) {
-        hitboxX = heroPos.x  - attackWidth+ attackRange;
+        hitboxX = heroPos.x - attackWidth + attackRange;
     } else {
-        hitboxX = heroPos.x- attackRange;
+        hitboxX = heroPos.x - attackRange;
     }
 
-    // Centrar verticalmente con un pequeño offset hacia arriba
-    hitboxY = heroPos.y- attackHeight*2 - 10.0f;
+    hitboxY = heroPos.y - attackHeight * 2 - 10.0f;
 
     return sf::FloatRect(hitboxX, hitboxY, attackWidth, attackHeight);
 }
@@ -86,18 +88,15 @@ AttackInfo CombatSystem::createHeroAttack(const Hero& hero) {
         return attack;
     }
 
-    // El ataque solo está activo durante ciertos frames de la animación
     const Animation* anim = hero.getCurrentAnimation();
     if (!anim) {
         return attack;
     }
 
-    // Determinar si el ataque está activo según el progreso de la animación
-    // Los ataques son activos en la mitad de la animación aproximadamente
     attack.active = true;
     attack.damage = getAttackDamage(state);
     attack.hitbox = getAttackHitbox(hero, state);
-    attack.duration = 0.3f;  // Ventana de tiempo para golpear
+    attack.duration = 0.3f;
     attack.elapsed = 0.0f;
 
     return attack;
@@ -133,53 +132,37 @@ void CombatSystem::applyDamage(Enemy& enemy, int damage) {
         enemy.triggerAction(EntityState::Hurt);
     }
 }
+
 void CombatSystem::update(Hero& hero, std::vector<Enemy*>& enemies, float dt) {
-    // Verificar si el hero está atacando
     EntityState heroState = hero.getState();
+
+    AttackTracker& tracker = attackTrackers[&hero];
+
+    if (tracker.lastState != heroState) {
+        tracker.hitEnemies.clear();
+        tracker.lastState = heroState;
+    }
 
     if (!isAttackState(heroState)) {
         return;
     }
 
-    // Obtener la animación actual
-    const Animation* anim = hero.getCurrentAnimation();
-    if (!anim) {
-        return;
-    }
-
-    // Para evitar múltiples golpes por animación
-    static std::map<const Hero*, bool> attackProcessed;
-
-    // Resetear cuando la animación empieza
-    if (anim->getCurrentFrame().left == 0) {
-        attackProcessed[&hero] = false;
-    }
-
-    if (attackProcessed[&hero]) {
-        return;
-    }
-
-    // Crear el ataque
     AttackInfo attack = createHeroAttack(hero);
     if (!attack.active) {
         return;
     }
 
-    bool hitSomething = false;
-
-    // Verificar colisión con enemigos
     for (Enemy* enemy : enemies) {
-        if (!enemy) continue;          // seguridad
+        if (!enemy) continue;
         if (!enemy->isAlive()) continue;
+
+        if (tracker.hitEnemies.find(enemy) != tracker.hitEnemies.end()) {
+            continue;
+        }
 
         if (checkAttackHit(attack, *enemy)) {
             applyDamage(*enemy, attack.damage);
-            hitSomething = true;
+            tracker.hitEnemies.insert(enemy);
         }
-    }
-
-    // Marcar ataque como procesado
-    if (hitSomething) {
-        attackProcessed[&hero] = true;
     }
 }
