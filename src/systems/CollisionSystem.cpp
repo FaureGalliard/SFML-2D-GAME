@@ -2,6 +2,7 @@
 #include "world/World.h"
 #include "world/Chunk.h"
 #include "objects/WorldObject.h"
+#include "entities/Entity.h"
 #include "core/Config.h"
 #include <cmath>
 
@@ -111,6 +112,33 @@ sf::Vector2f CollisionSystem::resolveCollision(
             resolution.y = overlapBottom;
         }
     }
-    
+
     return resolution;
+}
+
+bool CollisionSystem::canMoveTo(
+    const Entity& entity,
+    const World& world,
+    const sf::Vector2f& newPosition)
+{
+    sf::FloatRect localBounds = entity.getLocalBoundingBox();
+
+    sf::FloatRect testBounds(
+        newPosition.x + localBounds.left,
+        newPosition.y + localBounds.top,
+        localBounds.width,
+        localBounds.height
+    );
+
+    int tileX = static_cast<int>(newPosition.x / TILE_SIZE);
+    int tileY = static_cast<int>(newPosition.y / TILE_SIZE);
+
+    return !checkWorldObjectCollision(testBounds, world, tileX, tileY, 2);
+}
+
+bool CollisionSystem::checkEntityCollision(
+    const Entity& entity1,
+    const Entity& entity2)
+{
+    return entity1.getBounds().intersects(entity2.getBounds());
 }

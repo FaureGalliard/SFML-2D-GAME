@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <vector>
+#include <map>
 
 class Enemy;
 class World;
@@ -20,19 +21,19 @@ struct AIComponent {
 class AISystem {
 public:
     AISystem() = default;
-    
+
     // Actualizar la IA de todos los enemigos
     static void update(std::vector<Enemy*>& enemies, const World& world, float dt);
-    
+
     // Actualizar la IA de un enemigo individual
     static void updateEnemy(Enemy& enemy, AIComponent& ai, const World& world, float dt);
-    
+
     // Generar una nueva dirección aleatoria para moverse
     static sf::Vector2f generateRandomDirection();
-    
+
     // Cambiar el estado de la IA
     static void changeState(AIComponent& ai, AIState newState);
-    
+
     // Obtener tiempo aleatorio para un estado
     static float getRandomStateTime(AIState state);
 };
