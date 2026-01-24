@@ -63,3 +63,4 @@ void Entity::updateInvulnerability(float dt) {
         }
     }
 }
+

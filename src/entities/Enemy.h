@@ -24,7 +24,7 @@ public:
 
     Animation* getCurrentAnimation();
     const Animation* getCurrentAnimation() const;
-
+    void attack() { triggerAction(EntityState::Attack); }
 private:
 
     std::map<EntityState, std::unique_ptr<Animation>> animations;

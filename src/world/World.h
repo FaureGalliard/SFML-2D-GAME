@@ -44,12 +44,14 @@ public:
 
     const Tile* getTileGlobal(int wx, int wy) const;
 
+    void setHeroPosition(const sf::Vector2f& pos) { heroPosition = pos; }
+    sf::Vector2f getHeroPosition() const { return heroPosition; }
     Chunk* getChunk(int cx, int cy);
     const Chunk* getChunk(int cx, int cy) const;
 
 private:
     static constexpr int LOAD_RADIUS = 2;
-
+    sf::Vector2f heroPosition{0.0f, 0.0f};
     std::unordered_map<ChunkCoord, std::unique_ptr<Chunk>, ChunkCoordHash> chunks;
 
     std::unique_ptr<BiomeNoise> biomeNoise;

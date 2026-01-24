@@ -11,21 +11,17 @@ Game::Game()
       inputSystem()
 {
     window.setFramerateLimit(60);
-
     if (!tileset.load(
         "assets/Sunnyside_World_Assets/Tileset/spr_tileset_sunnysideworld_16px.png"
     )) {
         throw std::runtime_error("Failed to load tileset");
     }
-
     hero.setPosition(sf::Vector2f(
         CHUNK_SIZE * TILE_SIZE * 2.0f,
         CHUNK_SIZE * TILE_SIZE * 2.0f
     ));
-
     camera.setSize(sf::Vector2f(1280.0f, 720.0f));
     camera.setPosition(hero.getPosition());
-
     renderer.setDebugMode(false);
 }
 
@@ -45,13 +41,11 @@ void Game::processEvents() {
             window.close();
             running = false;
         }
-
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Escape) {
                 window.close();
                 running = false;
             }
-
             // Toggle debug con la tecla F3
             if (event.key.code == sf::Keyboard::F3) {
                 bool currentDebug = renderer.isDebugMode();
@@ -63,7 +57,6 @@ void Game::processEvents() {
 
 void Game::update(float dt) {
     inputSystem.update();
-
     sf::Vector2f moveDir = inputSystem.getMoveDirection();
     bool running = inputSystem.isRunning();
 
@@ -75,14 +68,18 @@ void Game::update(float dt) {
     }
 
     hero.update(dt);
-
     MovementSystem::update(hero, world, dt);
+
+    // CRÍTICO: Actualizar la posición del héroe en el mundo ANTES de actualizar el mundo
+    // Esto permite que el sistema de IA sepa dónde está el héroe
+    world.setHeroPosition(hero.getPosition());
+
+    // Actualizar el mundo (incluye actualización de IA de enemigos)
+    world.update(hero.getTileX(), hero.getTileY());
 
     // Sistema de combate - verificar si el hero golpea enemigos
     std::vector<Enemy*> enemies = world.getEnemies();
     CombatSystem::update(hero, enemies, dt);
-
-    world.update(hero.getTileX(), hero.getTileY());
 
     camera.update(hero.getPosition(), dt);
 }

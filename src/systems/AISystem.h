@@ -8,7 +8,8 @@ class World;
 
 enum class AIState {
     Idle,       // Enemigo quieto
-    Wandering   // Enemigo moviéndose
+    Wandering,   // Enemigo moviéndose
+    Hunting
 };
 
 struct AIComponent {
